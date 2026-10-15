@@ -1,0 +1,47 @@
+import React from 'react';
+import { DepartmentCard } from './DepartmentCard';
+import {
+  Cpu,
+  Factory,
+  CheckCircle2,
+  Boxes,
+  Wrench,
+  ShieldAlert,
+  AlertOctagon
+} from 'lucide-react';
+
+const DEPT_ICONS = {
+  technical_office: { icon: Cpu, route: '/technical-office', color: 'blue' },
+  production: { icon: Factory, route: '/production', color: 'cyan' },
+  quality: { icon: CheckCircle2, route: '/quality', color: 'green' },
+  planning_warehouse: { icon: Boxes, route: '/planning-warehouse', color: 'purple' },
+  maintenance: { icon: Wrench, route: '/maintenance', color: 'amber' },
+  safety: { icon: ShieldAlert, route: '/safety', color: 'green' },
+  violations_admin: { icon: AlertOctagon, route: '/violations-admin', color: 'red' }
+};
+
+export const DepartmentGrid = ({ departments = [] }) => {
+  return (
+    <div className="mx-dashboard-grid" style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+      gap: '1.25rem'
+    }}>
+      {departments.map((dept) => {
+        const meta = DEPT_ICONS[dept.departmentId] || { icon: Cpu, route: '/', color: 'blue' };
+        return (
+          <DepartmentCard
+            key={dept.departmentId}
+            departmentId={dept.departmentId}
+            name={dept.name}
+            managerName={dept.managerName}
+            performancePercentage={dept.performancePercentage}
+            route={meta.route}
+            icon={meta.icon}
+            color={meta.color}
+          />
+        );
+      })}
+    </div>
+  );
+};
