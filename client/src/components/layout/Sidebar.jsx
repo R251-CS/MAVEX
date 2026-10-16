@@ -7,9 +7,6 @@ import {
   Boxes,
   Wrench,
   DollarSign,
-  CheckCircle2,
-  ShieldCheck,
-  AlertOctagon,
   LogOut,
   User,
   ChevronRight,
@@ -25,9 +22,6 @@ const NAV_ITEMS = [
   { path: '/planning-warehouse', label: 'التخطيط والمستودعات', icon: Boxes, departmentId: 'planning_warehouse' },
   { path: '/maintenance', label: 'الصيانة والتشغيل', icon: Wrench, departmentId: 'maintenance' },
   { path: '/finance', label: 'الحسابات والمالية', icon: DollarSign, departmentId: 'finance' },
-  { path: '/quality', label: 'مراقبة الجودة', icon: CheckCircle2, departmentId: 'quality' },
-  { path: '/safety', label: 'السلامة والصحة المهنية', icon: ShieldCheck, departmentId: 'safety' },
-  { path: '/violations-admin', label: 'إدارة المخالفات والرقابة', icon: AlertOctagon, adminOnly: true },
 ];
 
 export const Sidebar = ({ isOpen, onClose, isCollapsed = false, onToggleCollapse }) => {

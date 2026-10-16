@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Factory, Cpu, CheckCircle2, Boxes, Wrench, ShieldCheck, DollarSign } from 'lucide-react';
+import { LayoutDashboard, Factory, Cpu, Boxes, Wrench, DollarSign } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 const MOBILE_ITEMS = [
@@ -9,8 +9,6 @@ const MOBILE_ITEMS = [
   { path: '/production', label: 'الإنتاج', icon: Factory, departmentId: 'production' },
   { path: '/planning-warehouse', label: 'المخازن', icon: Boxes, departmentId: 'planning_warehouse' },
   { path: '/maintenance', label: 'الصيانة', icon: Wrench, departmentId: 'maintenance' },
-  { path: '/quality', label: 'الجودة', icon: CheckCircle2, departmentId: 'quality' },
-  { path: '/safety', label: 'السلامة', icon: ShieldCheck, departmentId: 'safety' },
   { path: '/finance', label: 'المالية', icon: DollarSign, departmentId: 'finance' }
 ];
 
