@@ -5,14 +5,18 @@ async function listItems() {
   return await inventoryRepository.getInventoryItems();
 }
 
+async function listMovements() {
+  return await inventoryRepository.getMovements();
+}
+
 async function listWarehouses() {
   return await inventoryRepository.getWarehouses();
 }
 
 async function addMovement(data) {
-  const { itemId, warehouseId, type, quantity } = data;
-  if (!itemId || !warehouseId || !type || !quantity) {
-    throw new BadRequestError('الصنف، المخزن، نوع الحركة، والكمية حقول إجبارية');
+  const { itemId, type, quantity } = data;
+  if (!itemId || !type || !quantity) {
+    throw new BadRequestError('الصنف، نوع الحركة، والكمية حقول إجبارية');
   }
 
   if (quantity <= 0) {
@@ -28,6 +32,7 @@ async function addMovement(data) {
 
 module.exports = {
   listItems,
+  listMovements,
   listWarehouses,
   addMovement
 };

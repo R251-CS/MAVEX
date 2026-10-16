@@ -17,8 +17,32 @@ const financeRoutes = require('./modules/finance/finance.routes');
 
 const app = express();
 
-app.use(cors());
-app.use(express.json());
+// CORS مع إعدادات مناسبة
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production'
+    ? [process.env.CLIENT_URL || 'https://mavex.app']
+    : true,
+  methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-dev-user'],
+  credentials: true
+}));
+
+// تحسين الأداء - headers الأمان والضغط
+app.use((req, res, next) => {
+  // Cache static API responses
+  if (req.method === 'GET') {
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  }
+  // Security headers
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  next();
+});
+
+// JSON parsing مع حد أقصى للحجم
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
 
 // Root landing route for browser or direct access
 app.get('/', (req, res) => {
@@ -33,17 +57,41 @@ app.get('/', (req, res) => {
 // API version 1 root
 const apiV1Router = express.Router();
 
-// Health check endpoint
-apiV1Router.get('/health', (req, res) => {
-  res.status(200).json({
-    status: 'success',
-    data: {
-      uptime: process.uptime(),
-      timestamp: new Date().toISOString(),
-      service: 'Mavex API Gateway',
-      version: 'v1'
+// Health check endpoint with Firebase/Firestore status
+apiV1Router.get('/health', async (req, res) => {
+  const healthData = {
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString(),
+    service: 'Mavex API Gateway',
+    version: 'v1',
+    environment: process.env.NODE_ENV || 'development',
+    database: { status: 'unknown', latency: null }
+  };
+
+  // فحص اتصال Firestore
+  try {
+    const { db } = require('./config/firebase-admin');
+    if (db) {
+      const start = Date.now();
+      await db.collection('_health').limit(1).get();
+      healthData.database = {
+        status: 'connected',
+        provider: 'Firestore',
+        latency: `${Date.now() - start}ms`
+      };
+    } else {
+      healthData.database = { status: 'not_initialized', provider: 'Firestore' };
     }
-  });
+  } catch (dbErr) {
+    healthData.database = {
+      status: 'error',
+      provider: 'Firestore',
+      error: dbErr.code || dbErr.message
+    };
+  }
+
+  const httpStatus = healthData.database.status === 'error' ? 503 : 200;
+  res.status(httpStatus).json({ status: httpStatus === 200 ? 'success' : 'degraded', data: healthData });
 });
 
 // Register all modular monolith endpoints

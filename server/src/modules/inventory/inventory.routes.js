@@ -10,10 +10,13 @@ router.use(authenticate);
 // GET /api/v1/inventory/items
 router.get('/items', inventoryController.getItems);
 
+// GET /api/v1/inventory/movements (FR-16)
+router.get('/movements', inventoryController.getMovements);
+
 // GET /api/v1/inventory/warehouses
 router.get('/warehouses', inventoryController.getWarehouses);
 
-// POST /api/v1/inventory/movements
-router.post('/movements', authorize([ROLES.ADMIN, ROLES.DEPARTMENT_MANAGER]), inventoryController.createMovement);
+// POST /api/v1/inventory/movements (FR-14)
+router.post('/movements', authorize([ROLES.ADMIN, ROLES.DEPARTMENT_MANAGER, ROLES.DEPARTMENT_MEMBER]), inventoryController.createMovement);
 
 module.exports = router;

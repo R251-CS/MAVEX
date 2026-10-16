@@ -10,6 +10,15 @@ async function getOrders(req, res, next) {
   }
 }
 
+async function getProducts(req, res, next) {
+  try {
+    const products = await productionService.listProducts();
+    res.status(200).json({ status: 'success', data: { products } });
+  } catch (err) {
+    next(err);
+  }
+}
+
 async function createOrder(req, res, next) {
   try {
     const order = await productionService.startNewOrder(req.body);
@@ -31,6 +40,7 @@ async function updateStage(req, res, next) {
 
 module.exports = {
   getOrders,
+  getProducts,
   createOrder,
   updateStage
 };

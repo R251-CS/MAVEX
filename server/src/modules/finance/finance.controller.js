@@ -20,6 +20,15 @@ async function getParties(req, res, next) {
   }
 }
 
+async function createParty(req, res, next) {
+  try {
+    const party = await financeService.addParty(req.body);
+    res.status(201).json({ status: 'success', data: { party } });
+  } catch (err) {
+    next(err);
+  }
+}
+
 async function getTransactions(req, res, next) {
   try {
     const { partyId } = req.query;
@@ -30,8 +39,19 @@ async function getTransactions(req, res, next) {
   }
 }
 
+async function createTransaction(req, res, next) {
+  try {
+    const transaction = await financeService.recordTransaction(req.body);
+    res.status(201).json({ status: 'success', data: { transaction } });
+  } catch (err) {
+    next(err);
+  }
+}
+
 module.exports = {
   getPayroll,
   getParties,
-  getTransactions
+  createParty,
+  getTransactions,
+  createTransaction
 };

@@ -200,7 +200,7 @@ export default function Dashboard() {
           borderRadius: 'var(--radius-full)',
           border: '1px solid var(--color-border)'
         }}>
-          <span>7 أقسام تشغيلية</span>
+          <span>5 أقسام تشغيلية</span>
         </div>
       </div>
 

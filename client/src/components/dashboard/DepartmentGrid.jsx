@@ -3,21 +3,17 @@ import { DepartmentCard } from './DepartmentCard';
 import {
   Cpu,
   Factory,
-  CheckCircle2,
   Boxes,
   Wrench,
-  ShieldAlert,
-  AlertOctagon
+  DollarSign
 } from 'lucide-react';
 
 const DEPT_ICONS = {
   technical_office: { icon: Cpu, route: '/technical-office', color: 'blue' },
   production: { icon: Factory, route: '/production', color: 'cyan' },
-  quality: { icon: CheckCircle2, route: '/quality', color: 'green' },
   planning_warehouse: { icon: Boxes, route: '/planning-warehouse', color: 'purple' },
   maintenance: { icon: Wrench, route: '/maintenance', color: 'amber' },
-  safety: { icon: ShieldAlert, route: '/safety', color: 'green' },
-  violations_admin: { icon: AlertOctagon, route: '/violations-admin', color: 'red' }
+  finance: { icon: DollarSign, route: '/finance', color: 'green' }
 };
 
 export const DepartmentGrid = ({ departments = [] }) => {

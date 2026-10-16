@@ -7,13 +7,15 @@ const { ROLES } = require('../../shared/constants');
 
 router.use(authenticate);
 
-// GET /api/v1/finance/payroll?month=2026-10 (Admin only)
-router.get('/payroll', authorize([ROLES.ADMIN]), financeController.getPayroll);
+// GET /api/v1/finance/payroll?month=2026-10 (FR-17, FR-18)
+router.get('/payroll', financeController.getPayroll);
 
-// GET /api/v1/finance/parties?type=customer (Admin only)
-router.get('/parties', authorize([ROLES.ADMIN]), financeController.getParties);
+// GET & POST /api/v1/finance/parties (FR-19)
+router.get('/parties', financeController.getParties);
+router.post('/parties', authorize([ROLES.ADMIN, ROLES.DEPARTMENT_MANAGER]), financeController.createParty);
 
-// GET /api/v1/finance/transactions?partyId=xyz (Admin only)
-router.get('/transactions', authorize([ROLES.ADMIN]), financeController.getTransactions);
+// GET & POST /api/v1/finance/transactions (FR-20, FR-21, FR-22)
+router.get('/transactions', financeController.getTransactions);
+router.post('/transactions', authorize([ROLES.ADMIN, ROLES.DEPARTMENT_MANAGER]), financeController.createTransaction);
 
 module.exports = router;

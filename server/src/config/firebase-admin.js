@@ -1,6 +1,6 @@
 const admin = require('firebase-admin');
 
-const projectId = process.env.FIREBASE_PROJECT_ID || 'mavex-cb807';
+const projectId = process.env.FIREBASE_PROJECT_ID || 'mavex-1c5c5';
 
 // Initialize Firebase Admin SDK
 if (!admin.apps.length) {

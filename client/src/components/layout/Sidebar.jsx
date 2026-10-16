@@ -4,13 +4,11 @@ import {
   LayoutDashboard,
   Cpu,
   Factory,
-  CheckCircle2,
   Boxes,
   Wrench,
-  ShieldAlert,
-  AlertOctagon,
   LogOut,
-  User
+  User,
+  DollarSign
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
@@ -18,11 +16,9 @@ const NAV_ITEMS = [
   { path: '/', label: 'لوحة التحكم العامة', icon: LayoutDashboard },
   { path: '/technical-office', label: 'المكتب الفني', icon: Cpu },
   { path: '/production', label: 'إدارة الإنتاج', icon: Factory },
-  { path: '/quality', label: 'مراقبة الجودة', icon: CheckCircle2 },
   { path: '/planning-warehouse', label: 'التخطيط والمستودعات', icon: Boxes },
   { path: '/maintenance', label: 'الصيانة والتشغيل', icon: Wrench },
-  { path: '/safety', label: 'السلامة والصحة المهنية', icon: ShieldAlert },
-  { path: '/violations-admin', label: 'إدارة المخالفات', icon: AlertOctagon },
+  { path: '/finance', label: 'الحسابات والمالية', icon: DollarSign },
 ];
 
 export const Sidebar = ({ isOpen, onClose }) => {

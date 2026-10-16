@@ -1,21 +1,17 @@
 const DEPARTMENTS = {
   TECHNICAL_OFFICE: 'technical_office',
   PRODUCTION: 'production',
-  QUALITY: 'quality',
   PLANNING_WAREHOUSE: 'planning_warehouse',
   MAINTENANCE: 'maintenance',
-  SAFETY: 'safety',
-  VIOLATIONS_ADMIN: 'violations_admin'
+  FINANCE: 'finance'
 };
 
 const DEPARTMENT_NAMES_AR = {
   [DEPARTMENTS.TECHNICAL_OFFICE]: 'المكتب الفني',
   [DEPARTMENTS.PRODUCTION]: 'الإنتاج',
-  [DEPARTMENTS.QUALITY]: 'الجودة',
-  [DEPARTMENTS.PLANNING_WAREHOUSE]: 'التخطيط والمخازن',
-  [DEPARTMENTS.MAINTENANCE]: 'الصيانة',
-  [DEPARTMENTS.SAFETY]: 'السلامة والصحة المهنية',
-  [DEPARTMENTS.VIOLATIONS_ADMIN]: 'المخالفات والإدارة العليا'
+  [DEPARTMENTS.PLANNING_WAREHOUSE]: 'التخطيط والمستودعات',
+  [DEPARTMENTS.MAINTENANCE]: 'الصيانة والتشغيل',
+  [DEPARTMENTS.FINANCE]: 'الحسابات والمالية'
 };
 
 const ROLES = {

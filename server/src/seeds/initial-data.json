@@ -1,0 +1,519 @@
+{
+  "users": [
+    {
+      "id": "user-admin",
+      "email": "admin@mavex.com",
+      "name": "مدير النظام (أدمن)",
+      "role": "admin",
+      "departmentId": null,
+      "title": "الإدارة العليا",
+      "isActive": true
+    },
+    {
+      "id": "user-quality",
+      "email": "quality@mavex.com",
+      "name": "م. طارق محمود",
+      "role": "manager",
+      "departmentId": "quality",
+      "title": "مدير مراقبة الجودة",
+      "isActive": true
+    },
+    {
+      "id": "user-production",
+      "email": "production@mavex.com",
+      "name": "م. سامح عزت",
+      "role": "manager",
+      "departmentId": "production",
+      "title": "مدير الإنتاج",
+      "isActive": true
+    },
+    {
+      "id": "user-maintenance",
+      "email": "maintenance@mavex.com",
+      "name": "م. ياسر عبد الله",
+      "role": "manager",
+      "departmentId": "maintenance",
+      "title": "مدير الصيانة",
+      "isActive": true
+    },
+    {
+      "id": "user-safety",
+      "email": "safety@mavex.com",
+      "name": "أ. محمود فوزي",
+      "role": "manager",
+      "departmentId": "safety",
+      "title": "مسؤول السلامة والصحة المهنية",
+      "isActive": true
+    }
+  ],
+  "departments": [
+    {
+      "departmentId": "technical_office",
+      "name": "المكتب الفني",
+      "managerName": "م. أحمد حسن",
+      "performancePercentage": 95,
+      "color": "blue"
+    },
+    {
+      "departmentId": "production",
+      "name": "إدارة الإنتاج",
+      "managerName": "م. سامح عزت",
+      "performancePercentage": 84,
+      "color": "cyan"
+    },
+    {
+      "departmentId": "planning_warehouse",
+      "name": "التخطيط والمستودعات",
+      "managerName": "أ. خالد السيد",
+      "performancePercentage": 78,
+      "color": "purple"
+    },
+    {
+      "departmentId": "maintenance",
+      "name": "الصيانة والتشغيل",
+      "managerName": "م. ياسر عبد الله",
+      "performancePercentage": 91,
+      "color": "amber"
+    },
+    {
+      "departmentId": "finance",
+      "name": "الحسابات والمالية",
+      "managerName": "أ. حسام فوزي",
+      "performancePercentage": 90,
+      "color": "blue"
+    }
+  ],
+  "departmentMonthlyReports": [
+    {
+      "id": "technical_office_2026-10",
+      "departmentId": "technical_office",
+      "month": "2026-10",
+      "managerName": "م. أحمد حسن",
+      "performancePercentage": 95,
+      "status": "normal",
+      "kpis": { "completedDrawings": 42, "activeJobs": 8 }
+    },
+    {
+      "id": "production_2026-10",
+      "departmentId": "production",
+      "month": "2026-10",
+      "managerName": "م. سامح عزت",
+      "performancePercentage": 84,
+      "status": "normal",
+      "kpis": { "activeOrders": 14, "efficiency": 88 }
+    },
+    {
+      "id": "planning_warehouse_2026-10",
+      "departmentId": "planning_warehouse",
+      "month": "2026-10",
+      "managerName": "أ. خالد السيد",
+      "performancePercentage": 78,
+      "status": "normal",
+      "kpis": { "stockLevel": "94%", "leadTime": "3 أيام" }
+    },
+    {
+      "id": "maintenance_2026-10",
+      "departmentId": "maintenance",
+      "month": "2026-10",
+      "managerName": "م. ياسر عبد الله",
+      "performancePercentage": 91,
+      "status": "normal",
+      "kpis": { "uptime": "98.5%", "openTickets": 2 }
+    },
+    {
+      "id": "finance_2026-10",
+      "departmentId": "finance",
+      "month": "2026-10",
+      "managerName": "أ. حسام فوزي",
+      "performancePercentage": 90,
+      "status": "normal",
+      "kpis": { "collectionsRate": "92%", "pendingBills": 1 }
+    }
+  ],
+  "employees": [
+    {
+      "id": "emp-101",
+      "name": "م. أحمد حسن",
+      "title": "رئيس قسم التصميم والتخطيط الفني",
+      "departmentId": "technical_office",
+      "avatarColor": "#3b82f6",
+      "role": "manager",
+      "evaluationScore": 95,
+      "basicSalary": 9500,
+      "incentives": 2500,
+      "deductions": 0,
+      "netSalary": 12000,
+      "isActive": true
+    },
+    {
+      "id": "emp-102",
+      "name": "م. سامح عزت",
+      "title": "مدير خطوط الإنتاج والتشغيل",
+      "departmentId": "production",
+      "avatarColor": "#06b6d4",
+      "role": "manager",
+      "evaluationScore": 84,
+      "basicSalary": 8800,
+      "incentives": 2000,
+      "deductions": 200,
+      "netSalary": 10600,
+      "isActive": true
+    },
+    {
+      "id": "emp-103",
+      "name": "م. طارق محمود",
+      "title": "مدير ضبط وتأكيد الجودة",
+      "departmentId": "quality",
+      "avatarColor": "#10b981",
+      "role": "manager",
+      "evaluationScore": 95,
+      "basicSalary": 8500,
+      "incentives": 2200,
+      "deductions": 0,
+      "netSalary": 10700,
+      "isActive": true
+    },
+    {
+      "id": "emp-104",
+      "name": "م. ياسر عبد الله",
+      "title": "مهندس أول صيانة ميكانيكية وكهربائية",
+      "departmentId": "maintenance",
+      "avatarColor": "#f59e0b",
+      "role": "manager",
+      "evaluationScore": 91,
+      "basicSalary": 8200,
+      "incentives": 1800,
+      "deductions": 0,
+      "netSalary": 10000,
+      "isActive": true
+    },
+    {
+      "id": "emp-105",
+      "name": "أ. محمود فوزي",
+      "title": "أخصائي السلامة والصحة المهنية",
+      "departmentId": "safety",
+      "avatarColor": "#22c55e",
+      "role": "manager",
+      "evaluationScore": 85,
+      "basicSalary": 7500,
+      "incentives": 1500,
+      "deductions": 150,
+      "netSalary": 8850,
+      "isActive": true
+    },
+    {
+      "id": "emp-106",
+      "name": "فني محمود علي",
+      "title": "فني تشغيل ثناية هيدروليكية",
+      "departmentId": "production",
+      "avatarColor": "#38bdf8",
+      "role": "technician",
+      "evaluationScore": 92,
+      "basicSalary": 5500,
+      "incentives": 1200,
+      "deductions": 0,
+      "netSalary": 6700,
+      "machine": "ثناية هيدروليكية 150 طن",
+      "isActive": true
+    },
+    {
+      "id": "emp-107",
+      "name": "فني إبراهيم صابر",
+      "title": "فني قص وتفريغ بالليزر",
+      "departmentId": "production",
+      "avatarColor": "#a855f7",
+      "role": "technician",
+      "evaluationScore": 88,
+      "basicSalary": 5800,
+      "incentives": 1400,
+      "deductions": 100,
+      "netSalary": 7100,
+      "machine": "فايبر ليزر 6KW",
+      "isActive": true
+    }
+  ],
+  "products": [
+    {
+      "id": "prd-1",
+      "code": "PRD-ENC-01",
+      "name": "كبائن توزيع قوى كهربائية معزولة IP65",
+      "category": "لوحات تحكم كهربائية",
+      "rawMaterials": "صاج مجلفن 2 مم + شاسيه زوايا + دهان بودرة",
+      "stagesCount": 4
+    },
+    {
+      "id": "prd-2",
+      "code": "PRD-TNK-02",
+      "name": "خزانات وقود وموائع صناعية سعة 5000 لتر",
+      "category": "خزانات وأوعية ضغط",
+      "rawMaterials": "صاج مسحوب على الساخن 4 مم + لحام قوسي",
+      "stagesCount": 4
+    },
+    {
+      "id": "prd-3",
+      "code": "PRD-STR-03",
+      "name": "هياكل حديدية جمالونات وقواعد محطات طاقة",
+      "category": "هياكل معدنية ثقيلة",
+      "rawMaterials": "كمرات حديد IPE + بليتات ربط 12 مم",
+      "stagesCount": 4
+    }
+  ],
+  "productionOrders": [
+    {
+      "id": "ord-1",
+      "code": "WO-2026-101",
+      "productName": "كبائن توزيع كهربائية IP65 (دفعة 50 وحدة)",
+      "category": "لوحات تحكم كهربائية",
+      "rawMaterials": "صاج مجلفن 2 مم (3.5 طن) - باركود M-44",
+      "currentStage": "bending",
+      "status": "in_progress",
+      "delayReason": "",
+      "delayComment": "",
+      "stages": [
+        { "key": "material_receipt", "name": "استلام وفحص الخامات", "status": "completed", "completedAt": "2026-10-12", "operator": "أ. خالد السيد" },
+        { "key": "laser", "name": "القطع بالليزر (Fiber Laser)", "status": "completed", "completedAt": "2026-10-14", "operator": "إبراهيم صابر" },
+        { "key": "bending", "name": "الثناية والتشكيل (Bending)", "status": "in_progress", "completedAt": null, "operator": "محمود علي" },
+        { "key": "finishing_paint", "name": "التشطيب والدهان الإلكتروستاتيك", "status": "pending", "completedAt": null, "operator": "خط الدهان" }
+      ]
+    },
+    {
+      "id": "ord-2",
+      "code": "WO-2026-102",
+      "productName": "خزانات وقود ديزل احتياطي 5000 لتر (عدد 4)",
+      "category": "خزانات وأوعية ضغط",
+      "rawMaterials": "صاج أسود 4 مم (8 طن)",
+      "currentStage": "laser",
+      "status": "delayed",
+      "delayReason": "تأخر فحص الغاز وعينة ضغط الأكسجين",
+      "delayComment": "تم فحص الدفعة الجديدة من الأسطوانات وجاري استئناف القطع صباح الغد",
+      "stages": [
+        { "key": "material_receipt", "name": "استلام وفحص الخامات", "status": "completed", "completedAt": "2026-10-11", "operator": "أ. خالد السيد" },
+        { "key": "laser", "name": "القطع بالليزر (Fiber Laser)", "status": "in_progress", "completedAt": null, "operator": "إبراهيم صابر" },
+        { "key": "bending", "name": "الثناية والتشكيل (Bending)", "status": "pending", "completedAt": null, "operator": "محمود علي" },
+        { "key": "finishing_paint", "name": "التشطيب والدهان الإلكتروستاتيك", "status": "pending", "completedAt": null, "operator": "خط الدهان" }
+      ]
+    },
+    {
+      "id": "ord-3",
+      "code": "WO-2026-103",
+      "productName": "هيكل شاسيه محطة طاقة شمسية قطاع ج",
+      "category": "هياكل معدنية ثقيلة",
+      "rawMaterials": "كمرات صلب مجلفن UPN (12 طن)",
+      "currentStage": "finishing_paint",
+      "status": "in_progress",
+      "delayReason": "",
+      "delayComment": "",
+      "stages": [
+        { "key": "material_receipt", "name": "استلام وفحص الخامات", "status": "completed", "completedAt": "2026-10-08", "operator": "أ. خالد السيد" },
+        { "key": "laser", "name": "القطع بالليزر (Fiber Laser)", "status": "completed", "completedAt": "2026-10-10", "operator": "إبراهيم صابر" },
+        { "key": "bending", "name": "الثناية والتشكيل (Bending)", "status": "completed", "completedAt": "2026-10-13", "operator": "محمود علي" },
+        { "key": "finishing_paint", "name": "التشطيب والدهان الإلكتروستاتيك", "status": "in_progress", "completedAt": null, "operator": "كابينة الدهان 1" }
+      ]
+    }
+  ],
+  "inventoryItems": [
+    {
+      "id": "item-1",
+      "code": "RAW-ST-01",
+      "name": "ألواح صاج مسحوب على الساخن 3 مم",
+      "category": "خامات صاج وحديد",
+      "unit": "طن",
+      "quantity": 42,
+      "minThreshold": 15,
+      "location": "عنبر أ - رصيف 4"
+    },
+    {
+      "id": "item-2",
+      "code": "RAW-ST-02",
+      "name": "ألواح صاج مجلفن 2 مم عالي المتانة",
+      "category": "خامات صاج وحديد",
+      "unit": "طن",
+      "quantity": 28,
+      "minThreshold": 10,
+      "location": "عنبر أ - رصيف 2"
+    },
+    {
+      "id": "item-3",
+      "code": "CHM-PNT-01",
+      "name": "مسحوق دهان بودرة إلكتروستاتيك RAL-7035",
+      "category": "دهانات وتشطيب",
+      "unit": "كجم",
+      "quantity": 650,
+      "minThreshold": 200,
+      "location": "مخزن الكيماويات والدهانات"
+    },
+    {
+      "id": "item-4",
+      "code": "GAS-N2-01",
+      "name": "غاز نيتروجين عالي النقاوة للقص بالليزر",
+      "category": "غازات صناعية",
+      "unit": "أسطوانة",
+      "quantity": 18,
+      "minThreshold": 5,
+      "location": "محطة الغازات المركزية"
+    },
+    {
+      "id": "item-5",
+      "code": "FST-BOLT-01",
+      "name": "مسامير ربط صلب M12 عالي الإجهاد",
+      "category": "مثبتات ولوازم تجميع",
+      "unit": "ألف قطعة",
+      "quantity": 14,
+      "minThreshold": 3,
+      "location": "مخزن القطع التجميعية"
+    }
+  ],
+  "inventoryMovements": [
+    {
+      "id": "mov-1",
+      "itemId": "item-1",
+      "itemName": "ألواح صاج مسحوب على الساخن 3 مم",
+      "type": "IN",
+      "quantity": 12,
+      "previousBalance": 30,
+      "newBalance": 42,
+      "reason": "توريد جديد من مصانع حديد عز - إذن استلام #8801",
+      "referenceId": "REC-8801",
+      "createdBy": "أ. خالد السيد",
+      "createdAt": "2026-10-14T10:30:00Z"
+    },
+    {
+      "id": "mov-2",
+      "itemId": "item-2",
+      "itemName": "ألواح صاج مجلفن 2 مم",
+      "type": "OUT",
+      "quantity": 4,
+      "previousBalance": 32,
+      "newBalance": 28,
+      "reason": "صرف خامات لأمر تصنيع كبائن التوزيع #WO-2026-101",
+      "referenceId": "WO-2026-101",
+      "createdBy": "أ. خالد السيد",
+      "createdAt": "2026-10-15T08:15:00Z"
+    },
+    {
+      "id": "mov-3",
+      "itemId": "item-3",
+      "itemName": "مسحوق دهان بودرة إلكتروستاتيك",
+      "type": "OUT",
+      "quantity": 50,
+      "previousBalance": 700,
+      "newBalance": 650,
+      "reason": "صرف لكابينة الدهان الآلي للأمر #WO-2026-103",
+      "referenceId": "WO-2026-103",
+      "createdBy": "أ. خالد السيد",
+      "createdAt": "2026-10-15T11:45:00Z"
+    }
+  ],
+  "businessParties": [
+    {
+      "id": "party-1",
+      "name": "شركة المقاولون العرب للصناعات المعدنية",
+      "type": "customer",
+      "phone": "+20 100 234 5678",
+      "email": "orders@arabcont.com",
+      "balance": 420000,
+      "status": "active",
+      "commercialReg": "48201-GZ"
+    },
+    {
+      "id": "party-2",
+      "name": "مجموعة السويدي إليكتريك للتصنيع",
+      "type": "customer",
+      "phone": "+20 101 987 6543",
+      "email": "procurement@elsewedy.com",
+      "balance": 680000,
+      "status": "active",
+      "commercialReg": "19842-CA"
+    },
+    {
+      "id": "party-3",
+      "name": "شركة حديد عز للصناعات المتطورة",
+      "type": "supplier",
+      "phone": "+20 102 334 4556",
+      "email": "sales@ezzsteel.com",
+      "balance": -250000,
+      "status": "active",
+      "commercialReg": "88310-AL"
+    },
+    {
+      "id": "party-4",
+      "name": "الشركة الدولية للغازات والمستلزمات الصناعية",
+      "type": "supplier",
+      "phone": "+20 109 887 7665",
+      "email": "support@intlgases.com",
+      "balance": -45000,
+      "status": "active",
+      "commercialReg": "77412-CA"
+    }
+  ],
+  "financialTransactions": [
+    {
+      "id": "tx-1",
+      "type": "IN",
+      "amount": 280000,
+      "category": "تحصيل دفعات عملاء",
+      "partyName": "شركة المقاولون العرب",
+      "partyId": "party-1",
+      "description": "دفعة إنجاز تصنيع هياكل محطة التحلية بموجب مستخلص #3",
+      "reference": "INV-2026-112",
+      "paymentMethod": "تحويل بنكي (CIB)",
+      "date": "2026-10-14"
+    },
+    {
+      "id": "tx-2",
+      "type": "OUT",
+      "amount": 150000,
+      "category": "سداد مستحقات موردين",
+      "partyName": "شركة حديد عز",
+      "partyId": "party-3",
+      "description": "دفعة سداد فاتورة توريد صاج 3 مم دفعة شهر أكتوبر",
+      "reference": "BILL-EZZ-904",
+      "paymentMethod": "شيك مصرفي مقاصة",
+      "date": "2026-10-13"
+    },
+    {
+      "id": "tx-3",
+      "type": "IN",
+      "amount": 350000,
+      "category": "تحصيل دفعات عملاء",
+      "partyName": "مجموعة السويدي إليكتريك",
+      "partyId": "party-2",
+      "description": "دفعة تعاقد مقدمة لتوريد كبائن التوزيع المعزولة",
+      "reference": "INV-2026-115",
+      "paymentMethod": "تحويل بنكي (QNB)",
+      "date": "2026-10-11"
+    },
+    {
+      "id": "tx-4",
+      "type": "OUT",
+      "amount": 45000,
+      "category": "مصروفات تشغيل ومستلزمات",
+      "partyName": "الشركة الدولية للغازات الصناعية",
+      "partyId": "party-4",
+      "description": "تعبئة أسطوانات غاز النيتروجين لماكينات الليزر الصناعي",
+      "reference": "BILL-GAS-44",
+      "paymentMethod": "تحويل فوري",
+      "date": "2026-10-10"
+    }
+  ],
+  "qualityEvents": [
+    {
+      "id": "qe-1",
+      "title": "فحص دفعة توريد حديد التسليح #440",
+      "itemOrMachine": "قطاع التشكيل أ",
+      "status": "passed",
+      "month": "2026-10",
+      "inspector": "م. طارق محمود",
+      "date": "2026-10-12"
+    },
+    {
+      "id": "qe-2",
+      "title": "معايرة أجهزة قياس الضغط الهيدروليكي",
+      "itemOrMachine": "ماكينة الكبس CNC-02",
+      "status": "passed",
+      "month": "2026-10",
+      "inspector": "فني جودة حسام",
+      "date": "2026-10-14"
+    }
+  ]
+}

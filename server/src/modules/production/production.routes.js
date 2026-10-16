@@ -10,6 +10,9 @@ router.use(authenticate);
 // GET /api/v1/production/orders
 router.get('/orders', productionController.getOrders);
 
+// GET /api/v1/production/products (FR-04 Catalog)
+router.get('/products', productionController.getProducts);
+
 // POST /api/v1/production/orders
 router.post('/orders', authorize([ROLES.ADMIN, ROLES.DEPARTMENT_MANAGER]), productionController.createOrder);
 

@@ -5,9 +5,13 @@ async function listOrders(status) {
   return await productionRepository.getOrders(status);
 }
 
+async function listProducts() {
+  return await productionRepository.getProducts();
+}
+
 async function startNewOrder(data) {
-  if (!data.orderNumber || !data.productName || !data.quantity) {
-    throw new BadRequestError('رقم أمر الإنتاج، اسم المنتج، والكمية حقول إجبارية');
+  if (!data.productName) {
+    throw new BadRequestError('اسم المنتج حقل إجباري');
   }
   return await productionRepository.createOrder(data);
 }
@@ -21,6 +25,7 @@ async function advanceStage(orderId, stageKey, stageData) {
 
 module.exports = {
   listOrders,
+  listProducts,
   startNewOrder,
   advanceStage
 };
