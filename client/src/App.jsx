@@ -2,6 +2,7 @@ import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AppShell } from './components/layout';
 import { ProtectedRoute } from './components/common/ProtectedRoute';
+import { useAuth, getDepartmentRoute } from './context/AuthContext';
 
 // Lazy load pages for performance & instant loading
 const Dashboard = lazy(() => import('./pages/Dashboard/Dashboard'));
@@ -31,6 +32,16 @@ const PageLoader = () => (
   </div>
 );
 
+// دالة توجيه الصفحة الرئيسية: الأدمن يرى لوحة التحكم العامة، بينما كل قسم يوجّه لقسمه الخاص فقط
+function HomeRoute() {
+  const { profile } = useAuth();
+  if (profile?.role === 'admin') {
+    return <Dashboard />;
+  }
+  const targetRoute = getDepartmentRoute(profile?.departmentId);
+  return <Navigate to={targetRoute} replace />;
+}
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -42,14 +53,70 @@ export default function App() {
 
           {/* Protected Routes - Verified authentication wrapper */}
           <Route element={<ProtectedRoute><AppShell /></ProtectedRoute>}>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/technical-office" element={<TechnicalOffice />} />
-            <Route path="/production" element={<Production />} />
-            <Route path="/planning-warehouse" element={<PlanningWarehouse />} />
-            <Route path="/maintenance" element={<Maintenance />} />
-            <Route path="/finance" element={<Finance />} />
-            <Route path="/quality" element={<Quality />} />
-            <Route path="/safety" element={<Safety />} />
+            <Route path="/" element={<HomeRoute />} />
+
+            <Route 
+              path="/technical-office" 
+              element={
+                <ProtectedRoute requiredDepartment="technical_office">
+                  <TechnicalOffice />
+                </ProtectedRoute>
+              } 
+            />
+
+            <Route 
+              path="/production" 
+              element={
+                <ProtectedRoute requiredDepartment="production">
+                  <Production />
+                </ProtectedRoute>
+              } 
+            />
+
+            <Route 
+              path="/planning-warehouse" 
+              element={
+                <ProtectedRoute requiredDepartment="planning_warehouse">
+                  <PlanningWarehouse />
+                </ProtectedRoute>
+              } 
+            />
+
+            <Route 
+              path="/maintenance" 
+              element={
+                <ProtectedRoute requiredDepartment="maintenance">
+                  <Maintenance />
+                </ProtectedRoute>
+              } 
+            />
+
+            <Route 
+              path="/finance" 
+              element={
+                <ProtectedRoute requiredDepartment="finance">
+                  <Finance />
+                </ProtectedRoute>
+              } 
+            />
+
+            <Route 
+              path="/quality" 
+              element={
+                <ProtectedRoute requiredDepartment="quality">
+                  <Quality />
+                </ProtectedRoute>
+              } 
+            />
+
+            <Route 
+              path="/safety" 
+              element={
+                <ProtectedRoute requiredDepartment="safety">
+                  <Safety />
+                </ProtectedRoute>
+              } 
+            />
 
             {/* Admin-only restricted section */}
             <Route 

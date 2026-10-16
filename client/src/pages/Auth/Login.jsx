@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
-import { GlassCard, Button, TextField } from '../../components/common';
+import { useAuth, getDepartmentRoute } from '../../context/AuthContext';
+import { GlassCard, Button, TextField, MavexLogo } from '../../components/common';
 import { Lock, Mail, ShieldAlert, LogIn, UserPlus } from 'lucide-react';
 import { useToast } from '../../components/common/Toast';
 
@@ -16,10 +16,22 @@ export default function Login() {
   const location = useLocation();
   const { addToast } = useToast();
 
-  const handleSuccessfulAuth = () => {
+  useEffect(() => {
+    document.title = 'MAVEX | تسجيل الدخول';
+  }, []);
+
+  const handleSuccessfulAuth = (authResult) => {
     addToast('تم تسجيل الدخول بنجاح', 'success');
-    const from = location?.state?.from?.pathname || '/';
-    navigate(from, { replace: true });
+    const authUser = authResult?.user;
+    const requestedFrom = location?.state?.from?.pathname;
+
+    if (authUser?.role === 'admin') {
+      navigate(requestedFrom || '/', { replace: true });
+    } else {
+      const deptRoute = getDepartmentRoute(authUser?.departmentId);
+      const target = (requestedFrom && requestedFrom !== '/') ? requestedFrom : deptRoute;
+      navigate(target, { replace: true });
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -28,10 +40,11 @@ export default function Login() {
     setLoading(true);
 
     try {
+      let res;
       if (login) {
-        await login(email, password);
+        res = await login(email, password);
       }
-      handleSuccessfulAuth();
+      handleSuccessfulAuth(res);
     } catch (err) {
       setError(err.message || 'فشل تسجيل الدخول. يرجى التحقق من البريد وكلمة المرور.');
     } finally {
@@ -50,22 +63,7 @@ export default function Login() {
     }}>
       <GlassCard glow="blue" style={{ maxWidth: '480px', width: '100%', padding: '2.5rem 2rem' }}>
         <div style={{ textAlign: 'center', marginBottom: '1.75rem' }}>
-          <div style={{
-            display: 'inline-flex',
-            width: '54px',
-            height: '54px',
-            borderRadius: 'var(--radius-lg)',
-            background: 'linear-gradient(135deg, var(--accent-blue), var(--accent-purple))',
-            color: '#fff',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '1.5rem',
-            fontWeight: 800,
-            marginBottom: '1rem',
-            boxShadow: '0 4px 15px rgba(59, 130, 246, 0.4)'
-          }}>
-            M
-          </div>
+          <MavexLogo size={58} style={{ marginBottom: '1rem', filter: 'drop-shadow(0 6px 18px rgba(0, 242, 254, 0.3))' }} />
           <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-main)', margin: '0 0 0.5rem' }}>
             تسجيل الدخول — MAVEX
           </h1>

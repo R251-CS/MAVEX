@@ -15,3 +15,4 @@ export { PageHeader } from './PageHeader';
 export { KpiSlider } from './KpiSlider';
 export { DataTable } from './DataTable';
 export { PageContainer } from '../layout/PageContainer';
+export { MavexLogo } from './MavexLogo';

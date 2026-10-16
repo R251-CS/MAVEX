@@ -1,19 +1,32 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Factory, Cpu, CheckCircle2, Boxes } from 'lucide-react';
+import { LayoutDashboard, Factory, Cpu, CheckCircle2, Boxes, Wrench, ShieldCheck, DollarSign } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 
-const QUICK_NAV = [
-  { path: '/', label: 'الرئيسية', icon: LayoutDashboard },
-  { path: '/technical-office', label: 'الفني', icon: Cpu },
-  { path: '/production', label: 'الإنتاج', icon: Factory },
-  { path: '/quality', label: 'الجودة', icon: CheckCircle2 },
-  { path: '/planning-warehouse', label: 'المخازن', icon: Boxes }
+const MOBILE_ITEMS = [
+  { path: '/', label: 'الرئيسية', icon: LayoutDashboard, adminOnly: true },
+  { path: '/technical-office', label: 'المكتب الفني', icon: Cpu, departmentId: 'technical_office' },
+  { path: '/production', label: 'الإنتاج', icon: Factory, departmentId: 'production' },
+  { path: '/planning-warehouse', label: 'المخازن', icon: Boxes, departmentId: 'planning_warehouse' },
+  { path: '/maintenance', label: 'الصيانة', icon: Wrench, departmentId: 'maintenance' },
+  { path: '/quality', label: 'الجودة', icon: CheckCircle2, departmentId: 'quality' },
+  { path: '/safety', label: 'السلامة', icon: ShieldCheck, departmentId: 'safety' },
+  { path: '/finance', label: 'المالية', icon: DollarSign, departmentId: 'finance' }
 ];
 
 export const MobileNav = () => {
+  const { profile, isAdmin, canAccess } = useAuth() || {};
+
+  const visibleItems = MOBILE_ITEMS.filter((item) => {
+    if (isAdmin || profile?.role === 'admin') return true;
+    if (item.adminOnly) return false;
+    if (item.departmentId) return canAccess ? canAccess([], item.departmentId) : false;
+    return false;
+  });
+
   return (
     <nav className="mx-mobile-nav" aria-label="التنقل السريع للجوال">
-      {QUICK_NAV.map((item) => {
+      {visibleItems.map((item) => {
         const Icon = item.icon;
         return (
           <NavLink

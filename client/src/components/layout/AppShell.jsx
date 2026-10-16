@@ -1,10 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { Header } from './Header';
 import { Sidebar } from './Sidebar';
 import { MobileNav } from './MobileNav';
 
+const ROUTE_TITLES = {
+  '/': 'لوحة التحكم العامة',
+  '/technical-office': 'المكتب الفني',
+  '/production': 'إدارة الإنتاج',
+  '/planning-warehouse': 'التخطيط والمستودعات',
+  '/maintenance': 'الصيانة والتشغيل',
+  '/finance': 'الحسابات والمالية',
+  '/quality': 'مراقبة الجودة',
+  '/safety': 'السلامة والصحة المهنية',
+  '/violations-admin': 'إدارة المخالفات والرقابة'
+};
+
 export const AppShell = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    const pageTitle = ROUTE_TITLES[location.pathname] || 'نظام الإدارة الصناعية';
+    document.title = `MAVEX | ${pageTitle}`;
+  }, [location.pathname]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
     try {

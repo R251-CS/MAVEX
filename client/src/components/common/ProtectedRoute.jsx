@@ -1,6 +1,6 @@
 import React from 'react';
 import { Navigate, Outlet, useLocation, Link } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth, getDepartmentRoute } from '../../context/AuthContext';
 import { ShieldAlert, ArrowRight } from 'lucide-react';
 import { GlassCard } from './GlassCard';
 import { Button } from './Button';
@@ -49,6 +49,9 @@ export function ProtectedRoute({ children, allowedRoles, requiredDepartment }) {
   if ((allowedRoles && allowedRoles.length > 0) || requiredDepartment) {
     const hasPermission = canAccess(allowedRoles || [], requiredDepartment);
     if (!hasPermission) {
+      const returnPath = profile?.role === 'admin' ? '/' : getDepartmentRoute(profile?.departmentId);
+      const returnLabel = profile?.role === 'admin' ? 'العودة للوحة المؤشرات العامة' : 'العودة لقسمك المصرح';
+
       return (
         <div style={{
           display: 'flex',
@@ -75,11 +78,11 @@ export function ProtectedRoute({ children, allowedRoles, requiredDepartment }) {
               غير مصرح بالدخول لهذا القسم
             </h2>
             <p style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)', marginBottom: '1.75rem', lineHeight: 1.6 }}>
-              حسابك الحالي ({profile?.name || user.email}) لا يمتلك الصلاحية الكافية لعرض هذا القسم أو تعديل بياناته.
+              حسابك الحالي ({profile?.name || user.email}) مخصص لقسم آخر، ولا يمتلك الصلاحية لعرض هذه الوحدة أو تعديل سجلاتها.
             </p>
-            <Link to="/" style={{ textDecoration: 'none' }}>
+            <Link to={returnPath} style={{ textDecoration: 'none' }}>
               <Button variant="primary" icon={ArrowRight}>
-                العودة للوحة المؤشرات العامة
+                {returnLabel}
               </Button>
             </Link>
           </GlassCard>

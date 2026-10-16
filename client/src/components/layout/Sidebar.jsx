@@ -16,21 +16,22 @@ import {
   ChevronLeft
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { MavexLogo } from '../common/MavexLogo';
 
 const NAV_ITEMS = [
-  { path: '/', label: 'لوحة التحكم العامة', icon: LayoutDashboard },
-  { path: '/technical-office', label: 'المكتب الفني', icon: Cpu },
-  { path: '/production', label: 'إدارة الإنتاج', icon: Factory },
-  { path: '/planning-warehouse', label: 'التخطيط والمستودعات', icon: Boxes },
-  { path: '/maintenance', label: 'الصيانة والتشغيل', icon: Wrench },
-  { path: '/finance', label: 'الحسابات والمالية', icon: DollarSign },
-  { path: '/quality', label: 'مراقبة الجودة', icon: CheckCircle2 },
-  { path: '/safety', label: 'السلامة والصحة المهنية', icon: ShieldCheck },
+  { path: '/', label: 'لوحة التحكم العامة', icon: LayoutDashboard, adminOnly: true },
+  { path: '/technical-office', label: 'المكتب الفني', icon: Cpu, departmentId: 'technical_office' },
+  { path: '/production', label: 'إدارة الإنتاج', icon: Factory, departmentId: 'production' },
+  { path: '/planning-warehouse', label: 'التخطيط والمستودعات', icon: Boxes, departmentId: 'planning_warehouse' },
+  { path: '/maintenance', label: 'الصيانة والتشغيل', icon: Wrench, departmentId: 'maintenance' },
+  { path: '/finance', label: 'الحسابات والمالية', icon: DollarSign, departmentId: 'finance' },
+  { path: '/quality', label: 'مراقبة الجودة', icon: CheckCircle2, departmentId: 'quality' },
+  { path: '/safety', label: 'السلامة والصحة المهنية', icon: ShieldCheck, departmentId: 'safety' },
   { path: '/violations-admin', label: 'إدارة المخالفات والرقابة', icon: AlertOctagon, adminOnly: true },
 ];
 
 export const Sidebar = ({ isOpen, onClose, isCollapsed = false, onToggleCollapse }) => {
-  const { user, profile, logout, isAdmin } = useAuth() || {};
+  const { user, profile, logout, isAdmin, canAccess } = useAuth() || {};
 
   const handleLinkClick = () => {
     // Only close drawer on mobile/tablet screens
@@ -38,6 +39,23 @@ export const Sidebar = ({ isOpen, onClose, isCollapsed = false, onToggleCollapse
       onClose();
     }
   };
+
+  // تصفية الروابط بدقة: الأدمن يرى كل شيء، بينما عضو/مدير القسم يرى فقط القسم التابع له
+  const visibleNavItems = NAV_ITEMS.filter((item) => {
+    if (isAdmin || profile?.role === 'admin') {
+      return true;
+    }
+
+    if (item.adminOnly) {
+      return false;
+    }
+
+    if (item.departmentId) {
+      return canAccess ? canAccess([], item.departmentId) : false;
+    }
+
+    return false;
+  });
 
   return (
     <>
@@ -53,7 +71,7 @@ export const Sidebar = ({ isOpen, onClose, isCollapsed = false, onToggleCollapse
         aria-label="شريط التنقل الرئيسي"
       >
         <div className="mx-sidebar__brand">
-          <div className="mx-sidebar__logo-badge" title="MAVEX Metals">M</div>
+          <MavexLogo size={36} />
           {!isCollapsed && (
             <div className="mx-sidebar__brand-text">
               <span className="mx-sidebar__title">MAVEX</span>
@@ -74,12 +92,12 @@ export const Sidebar = ({ isOpen, onClose, isCollapsed = false, onToggleCollapse
         </div>
 
         <nav className="mx-sidebar__nav">
-          {!isCollapsed && <div className="mx-sidebar__section-title">الأقسام والوحدات</div>}
-          {NAV_ITEMS.map((item) => {
-            if (item.adminOnly && !isAdmin) {
-              return null;
-            }
-
+          {!isCollapsed && (
+            <div className="mx-sidebar__section-title">
+              {isAdmin || profile?.role === 'admin' ? 'الأقسام والوحدات' : 'القسم المصرح به'}
+            </div>
+          )}
+          {visibleNavItems.map((item) => {
             const Icon = item.icon;
             return (
               <NavLink

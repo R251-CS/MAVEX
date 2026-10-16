@@ -1,6 +1,24 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { authService } from '../services/authService';
 
+export const DEPARTMENT_ROUTES = {
+  production: '/production',
+  quality: '/quality',
+  maintenance: '/maintenance',
+  safety: '/safety',
+  planning_warehouse: '/planning-warehouse',
+  warehouse: '/planning-warehouse',
+  planning: '/planning-warehouse',
+  technical_office: '/technical-office',
+  finance: '/finance'
+};
+
+export const getDepartmentRoute = (departmentId) => {
+  if (!departmentId) return '/';
+  const clean = String(departmentId).toLowerCase();
+  return DEPARTMENT_ROUTES[clean] || '/';
+};
+
 export const SEED_ACCOUNTS = [
   {
     email: 'admin@mavex.com',

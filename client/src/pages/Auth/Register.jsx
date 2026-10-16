@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
-import { GlassCard, Button, TextField, SelectField } from '../../components/common';
+import { useAuth, getDepartmentRoute } from '../../context/AuthContext';
+import { GlassCard, Button, TextField, SelectField, MavexLogo } from '../../components/common';
 import { Lock, Mail, User, ShieldAlert, UserPlus, ArrowRight, Briefcase, Building } from 'lucide-react';
 import { useToast } from '../../components/common/Toast';
 
@@ -37,6 +37,10 @@ export default function Register() {
   const { register } = useAuth() || {};
   const navigate = useNavigate();
   const { addToast } = useToast();
+
+  useEffect(() => {
+    document.title = 'MAVEX | إنشاء حساب جديد';
+  }, []);
 
   const validate = () => {
     const newErrors = {};
@@ -79,7 +83,8 @@ export default function Register() {
         );
       }
       addToast('تم إنشاء الحساب بنجاح! مرحباً بك في MAVEX', 'success');
-      navigate('/');
+      const targetRoute = form.role === 'admin' ? '/' : getDepartmentRoute(form.departmentId);
+      navigate(targetRoute);
     } catch (err) {
       setGlobalError(err.message || 'فشل إنشاء الحساب. حاول مرة أخرى.');
     } finally {
@@ -99,22 +104,7 @@ export default function Register() {
       <GlassCard glow="blue" style={{ maxWidth: '520px', width: '100%', padding: '2.5rem 2rem' }}>
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: '1.75rem' }}>
-          <div style={{
-            display: 'inline-flex',
-            width: '54px',
-            height: '54px',
-            borderRadius: 'var(--radius-lg)',
-            background: 'var(--gradient-primary)',
-            color: '#fff',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '1.5rem',
-            fontWeight: 900,
-            marginBottom: '1rem',
-            boxShadow: '0 4px 15px rgba(25, 91, 77, 0.3)'
-          }}>
-            M
-          </div>
+          <MavexLogo size={58} style={{ marginBottom: '1rem', filter: 'drop-shadow(0 6px 18px rgba(0, 242, 254, 0.3))' }} />
           <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--color-text-primary)', margin: '0 0 0.5rem' }}>
             إنشاء حساب مستخدم جديد
           </h1>
