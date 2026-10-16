@@ -63,7 +63,7 @@ export const SEED_ACCOUNTS = [
     password: 'Warehouse@123456',
     name: 'م. كريم سامي',
     role: 'department_manager',
-    departmentId: 'warehouse',
+    departmentId: 'planning_warehouse',
     title: 'مدير التخطيط والمستودعات'
   }
 ];
@@ -250,7 +250,14 @@ export function AuthProvider({ children }) {
     }
 
     if (requiredDept) {
-      if (profile.departmentId && profile.departmentId !== requiredDept) {
+      const normalize = (d) => {
+        if (!d) return '';
+        const s = String(d).toLowerCase().trim();
+        if (s === 'warehouse' || s === 'planning') return 'planning_warehouse';
+        return s;
+      };
+
+      if (profile.departmentId && normalize(profile.departmentId) !== normalize(requiredDept)) {
         return false;
       }
     }

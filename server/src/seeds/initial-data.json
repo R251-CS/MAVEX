@@ -50,7 +50,7 @@
       "email": "warehouse@mavex.com",
       "name": "م. كريم سامي",
       "role": "manager",
-      "departmentId": "warehouse",
+      "departmentId": "planning_warehouse",
       "title": "مدير التخطيط والمستودعات",
       "isActive": true
     }

@@ -119,13 +119,13 @@ async function ensureDefaultUsersWithPasswords() {
       title: 'الإدارة العليا'
     },
     {
-      id: 'user-quality',
-      email: 'quality@mavex.com',
-      password: 'qual123',
-      name: 'م. طارق محمود',
+      id: 'user-office',
+      email: 'office@mavex.com',
+      password: 'office123',
+      name: 'م. أحمد حسن',
       role: 'department_manager',
-      departmentId: 'quality',
-      title: 'مدير مراقبة الجودة'
+      departmentId: 'technical_office',
+      title: 'مدير المكتب الفني'
     },
     {
       id: 'user-production',
@@ -146,15 +146,6 @@ async function ensureDefaultUsersWithPasswords() {
       title: 'مدير الصيانة'
     },
     {
-      id: 'user-safety',
-      email: 'safety@mavex.com',
-      password: 'safe123',
-      name: 'أ. محمود فوزي',
-      role: 'department_manager',
-      departmentId: 'safety',
-      title: 'مسؤول السلامة والصحة المهنية'
-    },
-    {
       id: 'user-finance',
       email: 'finance@mavex.com',
       password: 'fin123',
@@ -169,17 +160,8 @@ async function ensureDefaultUsersWithPasswords() {
       password: 'ware123',
       name: 'م. كريم سامي',
       role: 'department_manager',
-      departmentId: 'warehouse',
+      departmentId: 'planning_warehouse',
       title: 'مدير التخطيط والمستودعات'
-    },
-    {
-      id: 'user-office',
-      email: 'office@mavex.com',
-      password: 'office123',
-      name: 'م. أحمد حسن',
-      role: 'department_manager',
-      departmentId: 'technical_office',
-      title: 'مدير المكتب الفني'
     }
   ];
 
@@ -198,14 +180,18 @@ async function ensureDefaultUsersWithPasswords() {
         title: acc.title
       });
       console.log(`[Auth Migration] Created seed user in MongoDB: ${acc.email}`);
-    } else if (!existing.passwordHash) {
-      await updateUser(existing.id, {
-        passwordHash: hash,
-        role: acc.role,
-        departmentId: acc.departmentId || existing.departmentId,
-        title: acc.title || existing.title
-      });
-      console.log(`[Auth Migration] Stored hashed password in MongoDB for: ${acc.email}`);
+    } else {
+      const updates = {};
+      if (!existing.passwordHash) {
+        updates.passwordHash = hash;
+      }
+      if (acc.departmentId && existing.departmentId !== acc.departmentId) {
+        updates.departmentId = acc.departmentId;
+      }
+      if (Object.keys(updates).length > 0) {
+        await updateUser(existing.id, updates);
+        console.log(`[Auth Migration] Updated settings in MongoDB for: ${acc.email}`);
+      }
     }
   }
 }
