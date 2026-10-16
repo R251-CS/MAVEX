@@ -18,13 +18,17 @@ const DEPT_ICONS = {
 
 
 export const DepartmentGrid = ({ departments = [] }) => {
+  const activeDepartments = departments.filter(
+    (dept) => !['quality', 'safety', 'violations'].includes(dept.departmentId)
+  );
+
   return (
     <div className="mx-dashboard-grid" style={{
       display: 'grid',
       gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
       gap: '1.25rem'
     }}>
-      {departments.map((dept) => {
+      {activeDepartments.map((dept) => {
         const meta = DEPT_ICONS[dept.departmentId] || { icon: Cpu, route: '/', color: 'blue' };
         return (
           <DepartmentCard

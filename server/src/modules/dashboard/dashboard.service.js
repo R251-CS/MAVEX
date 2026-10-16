@@ -46,14 +46,14 @@ async function getDashboardOverview(month) {
 
   // Real-time Factory Operational Highlights from dynamic calculations
   const prodDept = departmentSummaries.find(d => d.departmentId === DEPARTMENTS.PRODUCTION);
-  const qualDept = departmentSummaries.find(d => d.departmentId === DEPARTMENTS.QUALITY);
+  const officeDept = departmentSummaries.find(d => d.departmentId === DEPARTMENTS.TECHNICAL_OFFICE);
   const maintDept = departmentSummaries.find(d => d.departmentId === DEPARTMENTS.MAINTENANCE);
-  const violDept = departmentSummaries.find(d => d.departmentId === DEPARTMENTS.VIOLATIONS);
+  const warehouseDept = departmentSummaries.find(d => d.departmentId === DEPARTMENTS.PLANNING_WAREHOUSE);
 
-  const activeOrdersCount = prodDept?.kpis?.activeOrders || 3;
-  const qualityRate = parseInt(qualDept?.kpis?.acceptance, 10) || 96;
+  const activeOrdersCount = prodDept?.kpis?.activeOrders || 14;
+  const officeDrawings = officeDept?.kpis?.completedDrawings || 42;
   const machineUptime = parseFloat(maintDept?.kpis?.uptime) || 98.5;
-  const openViolationsCount = violDept?.kpis?.activeViolations || 1;
+  const stockEfficiency = warehouseDept?.kpis?.stock || 94;
 
   return {
     month,
@@ -62,9 +62,9 @@ async function getDashboardOverview(month) {
     departments: departmentSummaries,
     highlights: {
       activeOrdersCount,
-      qualityRate,
+      officeDrawings,
       machineUptime,
-      openViolationsCount
+      stockEfficiency
     }
   };
 }

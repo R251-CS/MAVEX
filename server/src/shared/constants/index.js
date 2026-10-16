@@ -3,10 +3,7 @@ const DEPARTMENTS = {
   PRODUCTION: 'production',
   PLANNING_WAREHOUSE: 'planning_warehouse',
   MAINTENANCE: 'maintenance',
-  FINANCE: 'finance',
-  QUALITY: 'quality',
-  SAFETY: 'safety',
-  VIOLATIONS: 'violations'
+  FINANCE: 'finance'
 };
 
 const DEPARTMENT_NAMES_AR = {
@@ -14,10 +11,7 @@ const DEPARTMENT_NAMES_AR = {
   [DEPARTMENTS.PRODUCTION]: 'الإنتاج',
   [DEPARTMENTS.PLANNING_WAREHOUSE]: 'التخطيط والمستودعات',
   [DEPARTMENTS.MAINTENANCE]: 'الصيانة والتشغيل',
-  [DEPARTMENTS.FINANCE]: 'الحسابات والمالية',
-  [DEPARTMENTS.QUALITY]: 'مراقبة الجودة',
-  [DEPARTMENTS.SAFETY]: 'السلامة والصحة المهنية',
-  [DEPARTMENTS.VIOLATIONS]: 'إدارة المخالفات'
+  [DEPARTMENTS.FINANCE]: 'الحسابات والمالية'
 };
 
 const ROLES = {

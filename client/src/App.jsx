@@ -11,9 +11,6 @@ const Production = lazy(() => import('./pages/Production/Production'));
 const PlanningWarehouse = lazy(() => import('./pages/PlanningWarehouse/PlanningWarehouse'));
 const Maintenance = lazy(() => import('./pages/Maintenance/Maintenance'));
 const Finance = lazy(() => import('./pages/Finance/Finance'));
-const Quality = lazy(() => import('./pages/Quality/Quality'));
-const Safety = lazy(() => import('./pages/Safety/Safety'));
-const ViolationsAdmin = lazy(() => import('./pages/ViolationsAdmin/ViolationsAdmin'));
 const NotFound = lazy(() => import('./pages/NotFound/NotFound'));
 const Login = lazy(() => import('./pages/Auth/Login'));
 const Register = lazy(() => import('./pages/Auth/Register'));
@@ -96,34 +93,6 @@ export default function App() {
               element={
                 <ProtectedRoute requiredDepartment="finance">
                   <Finance />
-                </ProtectedRoute>
-              } 
-            />
-
-            <Route 
-              path="/quality" 
-              element={
-                <ProtectedRoute requiredDepartment="quality">
-                  <Quality />
-                </ProtectedRoute>
-              } 
-            />
-
-            <Route 
-              path="/safety" 
-              element={
-                <ProtectedRoute requiredDepartment="safety">
-                  <Safety />
-                </ProtectedRoute>
-              } 
-            />
-
-            {/* Admin-only restricted section */}
-            <Route 
-              path="/violations-admin" 
-              element={
-                <ProtectedRoute allowedRoles={['admin']}>
-                  <ViolationsAdmin />
                 </ProtectedRoute>
               } 
             />

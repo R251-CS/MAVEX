@@ -4,7 +4,7 @@ import { PageContainer, PageHeader, Skeleton, ErrorState, GlassCard } from '../.
 import { OverallPerformanceCard } from '../../components/dashboard/OverallPerformanceCard';
 import { DepartmentGrid } from '../../components/dashboard/DepartmentGrid';
 import { PerformanceChart } from '../../components/dashboard/PerformanceChart';
-import { RotateCw, Zap, CheckCircle2, Factory, ShieldCheck } from 'lucide-react';
+import { RotateCw, Zap, Boxes, Factory, Wrench } from 'lucide-react';
 import { Button } from '../../components/common/Button';
 
 export default function Dashboard() {
@@ -28,7 +28,7 @@ export default function Dashboard() {
           <Skeleton height="320px" borderRadius="var(--radius-lg)" />
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.25rem' }}>
-          {Array.from({ length: 7 }).map((_, idx) => (
+          {Array.from({ length: 5 }).map((_, idx) => (
             <Skeleton key={idx} height="220px" borderRadius="var(--radius-lg)" />
           ))}
         </div>
@@ -45,7 +45,9 @@ export default function Dashboard() {
   }
 
   const overall = data?.overallPerformance ?? 76;
-  const departments = data?.departments ?? [];
+  const departments = (data?.departments ?? []).filter(
+    (d) => !['quality', 'safety', 'violations'].includes(d.departmentId)
+  );
 
   return (
     <PageContainer>
@@ -126,15 +128,15 @@ export default function Dashboard() {
             alignItems: 'center',
             justifyContent: 'center'
           }}>
-            <CheckCircle2 size={22} />
+            <Boxes size={22} />
           </div>
           <div>
-            <span style={{ fontSize: '0.8125rem', color: 'var(--color-text-secondary)', fontWeight: 600 }}>مؤشر جودة الفحص</span>
+            <span style={{ fontSize: '0.8125rem', color: 'var(--color-text-secondary)', fontWeight: 600 }}>كفاءة المستودعات والمخزون</span>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.375rem', marginTop: '0.125rem' }}>
               <span style={{ fontSize: '1.625rem', fontWeight: 900, color: 'var(--color-text-primary)', lineHeight: 1 }}>
-                {data?.highlights?.qualityRate ?? 95.8}%
+                {data?.highlights?.stockEfficiency ?? 94}%
               </span>
-              <span style={{ fontSize: '0.75rem', color: 'var(--color-success)', fontWeight: 700 }}>اجتياز تام</span>
+              <span style={{ fontSize: '0.75rem', color: 'var(--color-success)', fontWeight: 700 }}>وفرة مكتملة</span>
             </div>
           </div>
         </GlassCard>
@@ -151,7 +153,7 @@ export default function Dashboard() {
             alignItems: 'center',
             justifyContent: 'center'
           }}>
-            <ShieldCheck size={22} />
+            <Wrench size={22} />
           </div>
           <div>
             <span style={{ fontSize: '0.8125rem', color: 'var(--color-text-secondary)', fontWeight: 600 }}>جاهزية الماكينات</span>
@@ -207,7 +209,7 @@ export default function Dashboard() {
           borderRadius: 'var(--radius-full)',
           border: '1px solid var(--color-border)'
         }}>
-          <span>{departments.length || 8} أقسام ووحدات تشغيلية</span>
+          <span>{departments.length || 5} أقسام ووحدات تشغيلية</span>
         </div>
       </div>
 

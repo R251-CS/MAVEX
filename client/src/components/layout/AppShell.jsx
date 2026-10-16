@@ -10,10 +10,7 @@ const ROUTE_TITLES = {
   '/production': 'إدارة الإنتاج',
   '/planning-warehouse': 'التخطيط والمستودعات',
   '/maintenance': 'الصيانة والتشغيل',
-  '/finance': 'الحسابات والمالية',
-  '/quality': 'مراقبة الجودة',
-  '/safety': 'السلامة والصحة المهنية',
-  '/violations-admin': 'إدارة المخالفات والرقابة'
+  '/finance': 'الحسابات والمالية'
 };
 
 export const AppShell = () => {

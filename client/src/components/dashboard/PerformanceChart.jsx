@@ -3,10 +3,10 @@ import { GlassCard } from '../common/GlassCard';
 import { BarChart3, Sparkles } from 'lucide-react';
 
 export const PerformanceChart = ({ departments = [] }) => {
-  // Sort departments by performance percentage descending
-  const sortedDepts = [...departments].sort(
-    (a, b) => (Number(b.performancePercentage) || 0) - (Number(a.performancePercentage) || 0)
-  );
+  // Sort active departments by performance percentage descending
+  const sortedDepts = [...departments]
+    .filter((dept) => !['quality', 'safety', 'violations'].includes(dept.departmentId))
+    .sort((a, b) => (Number(b.performancePercentage) || 0) - (Number(a.performancePercentage) || 0));
 
   return (
     <GlassCard glow="blue" style={{ padding: '1.75rem', height: '100%', display: 'flex', flexDirection: 'column' }}>
