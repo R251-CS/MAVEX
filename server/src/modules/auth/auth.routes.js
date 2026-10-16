@@ -1,18 +1,24 @@
 const express = require('express');
 const router = express.Router();
+const authController = require('./auth.controller');
 const authenticate = require('../../middleware/authenticate');
 
 /**
- * GET /api/v1/auth/me
- * Returns authenticated user info along with profile, role, and departmentId
+ * POST /api/v1/auth/login
+ * Validates credentials against MongoDB and returns JWT
  */
-router.get('/me', authenticate, (req, res) => {
-  res.status(200).json({
-    status: 'success',
-    data: {
-      user: req.user
-    }
-  });
-});
+router.post('/login', authController.login);
+
+/**
+ * POST /api/v1/auth/register
+ * Creates a new user in MongoDB with bcrypt hashed password
+ */
+router.post('/register', authController.register);
+
+/**
+ * GET /api/v1/auth/me
+ * Returns current authenticated user profile
+ */
+router.get('/me', authenticate, authController.getMe);
 
 module.exports = router;

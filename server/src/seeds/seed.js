@@ -13,7 +13,7 @@
 
 require('dotenv').config();
 const initialData = require('./initial-data.json');
-const { db, isDbConfigured } = require('../config/firebase-admin');
+const { db, isDbConfigured, connectMongoDB } = require('../config/mongodb');
 
 async function runSeed() {
   const isDryRun = process.argv.includes('--dry-run');
@@ -68,11 +68,10 @@ async function runSeed() {
 
   // 2. Cloud Database Seeding (If credentials provided)
   if (!isDbConfigured || isDryRun) {
-    console.log('ℹ️ [2/3] Cloud Firestore credentials not configured or in dry-run mode.');
-    console.log('  The system uses the verified baseline initial-data.json for zero-downtime development.');
-    console.log('  To connect live Firestore: set FIREBASE_CLIENT_EMAIL and FIREBASE_PRIVATE_KEY in .env.\n');
+    console.log('ℹ️ [2/3] MongoDB in dry-run mode.');
+    console.log('  The system uses the verified baseline initial-data.json for zero-downtime development.\n');
   } else {
-    console.log('🚀 [2/3] Seeding data to Google Cloud Firestore (Idempotent Upsert)...');
+    console.log('🚀 [2/3] Seeding data to MongoDB Atlas (Idempotent Upsert)...');
     try {
       // Upsert departments
       for (const dept of initialData.departments) {

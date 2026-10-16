@@ -5,15 +5,6 @@ import { GlassCard, Button, TextField } from '../../components/common';
 import { Lock, Mail, ShieldAlert, LogIn, UserPlus } from 'lucide-react';
 import { useToast } from '../../components/common/Toast';
 
-const FIREBASE_ERRORS = {
-  'auth/user-not-found': 'لا يوجد حساب بهذا البريد الإلكتروني',
-  'auth/wrong-password': 'كلمة المرور غير صحيحة',
-  'auth/invalid-credential': 'البريد الإلكتروني أو كلمة المرور غير صحيحة',
-  'auth/too-many-requests': 'تم تجاوز عدد المحاولات. حاول لاحقاً',
-  'auth/network-request-failed': 'تحقق من اتصال الإنترنت',
-  'auth/configuration-not-found': 'تنبيه: يجب تفعيل موفر Email/Password في لوحة Firebase Console'
-};
-
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -42,8 +33,7 @@ export default function Login() {
       }
       handleSuccessfulAuth();
     } catch (err) {
-      const msg = FIREBASE_ERRORS[err.code] || err.message || 'فشل تسجيل الدخول. يرجى التحقق من البريد وكلمة المرور.';
-      setError(msg);
+      setError(err.message || 'فشل تسجيل الدخول. يرجى التحقق من البريد وكلمة المرور.');
     } finally {
       setLoading(false);
     }

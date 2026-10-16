@@ -1,4 +1,4 @@
-const { db, isDbConfigured } = require('../../config/firebase-admin');
+const { db, isDbConfigured } = require('../../config/mongodb');
 const initialData = require('../../seeds/initial-data.json');
 
 async function getViolations(month) {

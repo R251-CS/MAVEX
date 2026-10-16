@@ -5,13 +5,6 @@ import { GlassCard, Button, TextField } from '../../components/common';
 import { Lock, Mail, User, ShieldAlert, UserPlus, ArrowRight } from 'lucide-react';
 import { useToast } from '../../components/common/Toast';
 
-const FIREBASE_ERRORS = {
-  'auth/email-already-in-use': 'البريد الإلكتروني مستخدم مسبقاً',
-  'auth/invalid-email': 'البريد الإلكتروني غير صالح',
-  'auth/weak-password': 'كلمة المرور يجب أن تكون 6 أحرف على الأقل',
-  'auth/network-request-failed': 'تحقق من اتصال الإنترنت'
-};
-
 export default function Register() {
   const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '' });
   const [errors, setErrors] = useState({});
@@ -55,8 +48,7 @@ export default function Register() {
       addToast('تم إنشاء الحساب بنجاح! مرحباً بك', 'success');
       navigate('/');
     } catch (err) {
-      const msg = FIREBASE_ERRORS[err.code] || err.message || 'فشل إنشاء الحساب. حاول مرة أخرى.';
-      setGlobalError(msg);
+      setGlobalError(err.message || 'فشل إنشاء الحساب. حاول مرة أخرى.');
     } finally {
       setLoading(false);
     }

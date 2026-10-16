@@ -30,6 +30,15 @@ async function connectMongoDB(timeoutMs = 10000, required = false) {
 
     // Auto-seed baseline collections if empty
     await seedMongoIfEmpty();
+
+    // Ensure default users have hashed passwords stored in MongoDB
+    try {
+      const { ensureDefaultUsersWithPasswords } = require('../modules/auth/auth.repository');
+      await ensureDefaultUsersWithPasswords();
+    } catch (authSeedErr) {
+      console.warn('[MongoDB Auth Seed] Notice:', authSeedErr.message);
+    }
+
     return mongoose.connection;
   } catch (err) {
     isConnected = false;

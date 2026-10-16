@@ -1,4 +1,4 @@
-const { db } = require('../../config/firebase-admin');
+const { db } = require('../../config/mongodb');
 const initialData = require('../../seeds/initial-data.json');
 
 async function getEmployeesByDepartment(departmentId) {

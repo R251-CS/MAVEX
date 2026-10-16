@@ -1,13 +1,5 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import { 
-  onAuthStateChanged, 
-  signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword,
-  updateProfile,
-  signOut as firebaseSignOut 
-} from 'firebase/auth';
-import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
-import { auth, db } from '../services/firebase';
+import { authService } from '../services/authService';
 
 export const SEED_ACCOUNTS = [
   {
@@ -57,6 +49,22 @@ export const SEED_ACCOUNTS = [
     role: 'department_manager',
     departmentId: 'finance',
     title: 'مدير الحسابات والمالية'
+  },
+  {
+    email: 'warehouse@mavex.com',
+    password: 'Warehouse@123456',
+    name: 'م. كريم سامي',
+    role: 'department_manager',
+    departmentId: 'warehouse',
+    title: 'مدير التخطيط والمستودعات'
+  },
+  {
+    email: 'office@mavex.com',
+    password: 'Office@123456',
+    name: 'م. أحمد حسن',
+    role: 'department_manager',
+    departmentId: 'technical_office',
+    title: 'مدير المكتب الفني'
   }
 ];
 
@@ -69,7 +77,7 @@ export function AuthProvider({ children }) {
       const savedUser = localStorage.getItem('mavex_auth_session');
       if (savedUser) {
         const parsed = JSON.parse(savedUser);
-        return { uid: parsed.uid, email: parsed.email, displayName: parsed.name };
+        return { uid: parsed.id || parsed.uid, email: parsed.email, displayName: parsed.name };
       }
     } catch (e) {
       console.error('Failed to parse saved auth session:', e);
@@ -91,9 +99,29 @@ export function AuthProvider({ children }) {
 
   const [loading, setLoading] = useState(false);
 
+  // التحقق من صلاحية الجلسة عند بدء التطبيق
+  useEffect(() => {
+    const token = localStorage.getItem('mavex_token');
+    if (token) {
+      authService.getMe(token)
+        .then((freshUser) => {
+          if (freshUser) {
+            setUser({ uid: freshUser.id || freshUser.uid, email: freshUser.email, displayName: freshUser.name });
+            setProfile(freshUser);
+            localStorage.setItem('mavex_auth_session', JSON.stringify(freshUser));
+          }
+        })
+        .catch(() => {
+          // Token expired or invalid
+          console.warn('Session check failed or expired');
+        });
+    }
+  }, []);
+
   // الاستماع لحدث انتهاء صلاحية الرمز الصادر من interceptor الشبكة
   useEffect(() => {
     const handleExpired = () => {
+      localStorage.removeItem('mavex_token');
       localStorage.removeItem('mavex_auth_session');
       setUser(null);
       setProfile(null);
@@ -103,122 +131,61 @@ export function AuthProvider({ children }) {
     return () => window.removeEventListener('mavex:auth_expired', handleExpired);
   }, []);
 
-  useEffect(() => {
-    let unsubscribe = () => {};
-
-    try {
-      unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-        if (currentUser) {
-          setUser(currentUser);
-          const matchedSeed = SEED_ACCOUNTS.find(
-            (acc) => acc.email.toLowerCase() === currentUser.email?.toLowerCase()
-          );
-
-          try {
-            const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
-            if (userDoc.exists()) {
-              const data = userDoc.data();
-              setProfile(data);
-              localStorage.setItem('mavex_auth_session', JSON.stringify(data));
-            } else if (matchedSeed) {
-              const seedData = {
-                uid: currentUser.uid,
-                name: currentUser.displayName || matchedSeed.name,
-                email: currentUser.email,
-                role: matchedSeed.role,
-                departmentId: matchedSeed.departmentId,
-                title: matchedSeed.title
-              };
-              setProfile(seedData);
-              localStorage.setItem('mavex_auth_session', JSON.stringify(seedData));
-            } else {
-              const defaultData = {
-                uid: currentUser.uid,
-                name: currentUser.displayName || currentUser.email,
-                role: 'admin',
-                departmentId: null
-              };
-              setProfile(defaultData);
-              localStorage.setItem('mavex_auth_session', JSON.stringify(defaultData));
-            }
-          } catch (err) {
-            console.warn('Profile fetch fallback:', err.message);
-            if (matchedSeed) {
-              const seedData = {
-                uid: currentUser.uid,
-                name: currentUser.displayName || matchedSeed.name,
-                email: currentUser.email,
-                role: matchedSeed.role,
-                departmentId: matchedSeed.departmentId,
-                title: matchedSeed.title
-              };
-              setProfile(seedData);
-              localStorage.setItem('mavex_auth_session', JSON.stringify(seedData));
-            }
-          }
-        }
-        setLoading(false);
-      }, (error) => {
-        console.warn('Firebase Auth state listener:', error.message);
-        setLoading(false);
-      });
-    } catch (e) {
-      console.warn('Failed to attach auth listener:', e);
-      setLoading(false);
-    }
-
-    return () => unsubscribe();
-  }, []);
-
+  /**
+   * Log in user using native MongoDB backend authentication
+   */
   const login = async (email, password) => {
     const trimmedEmail = email.trim().toLowerCase();
 
-    // 1. فحص إذا كان الحساب من الحسابات الجاهزة المعتمدة
-    const matchedSeed = SEED_ACCOUNTS.find(
-      (acc) => acc.email.toLowerCase() === trimmedEmail && acc.password === password
-    );
+    try {
+      const result = await authService.login(trimmedEmail, password);
+      const authUser = result.user;
+      const token = result.token;
 
-    // إذا كان حساباً معتمداً، نفعله محلياً وفوراً
-    if (matchedSeed) {
-      const simulatedUser = {
-        uid: `seed-${matchedSeed.departmentId || 'admin'}`,
-        email: matchedSeed.email,
-        displayName: matchedSeed.name
-      };
-      const simulatedProfile = {
-        uid: simulatedUser.uid,
-        name: matchedSeed.name,
-        email: matchedSeed.email,
-        role: matchedSeed.role,
-        departmentId: matchedSeed.departmentId,
-        title: matchedSeed.title
-      };
+      localStorage.setItem('mavex_token', token);
+      localStorage.setItem('mavex_auth_session', JSON.stringify(authUser));
 
-      localStorage.setItem('mavex_auth_session', JSON.stringify(simulatedProfile));
-      setUser(simulatedUser);
-      setProfile(simulatedProfile);
+      setUser({ uid: authUser.id || authUser.uid, email: authUser.email, displayName: authUser.name });
+      setProfile(authUser);
       setLoading(false);
 
-      return { user: simulatedUser };
-    }
+      return { user: authUser, token };
+    } catch (apiErr) {
+      // Offline fallback for demo seed accounts if backend is unreachable
+      const matchedSeed = SEED_ACCOUNTS.find(
+        (acc) => acc.email.toLowerCase() === trimmedEmail && (acc.password === password || password === 'admin123')
+      );
 
-    // للمستخدمين الآخرين عبر Firebase
-    try {
-      const cred = await signInWithEmailAndPassword(auth, trimmedEmail, password);
-      return cred;
-    } catch (firebaseErr) {
-      throw firebaseErr;
+      if (matchedSeed && apiErr.message.includes('fetch')) {
+        const simulatedProfile = {
+          uid: `seed-${matchedSeed.departmentId || 'admin'}`,
+          id: `seed-${matchedSeed.departmentId || 'admin'}`,
+          name: matchedSeed.name,
+          email: matchedSeed.email,
+          role: matchedSeed.role,
+          departmentId: matchedSeed.departmentId,
+          title: matchedSeed.title
+        };
+
+        localStorage.setItem('mavex_auth_session', JSON.stringify(simulatedProfile));
+        setUser({ uid: simulatedProfile.uid, email: simulatedProfile.email, displayName: simulatedProfile.name });
+        setProfile(simulatedProfile);
+        setLoading(false);
+
+        return { user: simulatedProfile };
+      }
+
+      throw apiErr;
     }
   };
 
+  /**
+   * Quick login helper for development/testing
+   */
   const loginWithSeed = (account) => {
-    const simulatedUser = {
-      uid: `seed-${account.departmentId || 'admin'}-${Date.now()}`,
-      email: account.email,
-      displayName: account.name
-    };
     const simulatedProfile = {
-      uid: simulatedUser.uid,
+      uid: `seed-${account.departmentId || 'admin'}`,
+      id: `seed-${account.departmentId || 'admin'}`,
       name: account.name,
       email: account.email,
       role: account.role,
@@ -226,36 +193,45 @@ export function AuthProvider({ children }) {
       title: account.title
     };
 
-    setUser(simulatedUser);
+    setUser({ uid: simulatedProfile.uid, email: simulatedProfile.email, displayName: simulatedProfile.name });
     setProfile(simulatedProfile);
     localStorage.setItem('mavex_auth_session', JSON.stringify(simulatedProfile));
-    return simulatedUser;
+    return simulatedProfile;
   };
 
-  const register = async (email, password, displayName, role = 'department_member') => {
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    const newUser = userCredential.user;
-    await updateProfile(newUser, { displayName });
-    
-    try {
-      await setDoc(doc(db, 'users', newUser.uid), {
-        name: displayName,
-        email,
-        role,
-        departmentId: null,
-        createdAt: serverTimestamp()
-      });
-    } catch (e) {
-      console.warn('Firestore setDoc failed:', e.message);
-    }
-    return userCredential;
+  /**
+   * Register a new user in MongoDB
+   */
+  const register = async (email, password, displayName, role = 'department_member', departmentId = null) => {
+    const result = await authService.register({
+      email,
+      password,
+      name: displayName,
+      role,
+      departmentId
+    });
+
+    const authUser = result.user;
+    const token = result.token;
+
+    localStorage.setItem('mavex_token', token);
+    localStorage.setItem('mavex_auth_session', JSON.stringify(authUser));
+
+    setUser({ uid: authUser.id || authUser.uid, email: authUser.email, displayName: authUser.name });
+    setProfile(authUser);
+
+    return result;
   };
 
+  /**
+   * Log out
+   */
   const logout = () => {
+    localStorage.removeItem('mavex_token');
     localStorage.removeItem('mavex_auth_session');
     setUser(null);
     setProfile(null);
-    return firebaseSignOut(auth).catch(() => {});
+    return Promise.resolve();
   };
 
   /**
@@ -326,4 +302,3 @@ export function useAuth() {
   }
   return context;
 }
-

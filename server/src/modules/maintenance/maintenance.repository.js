@@ -1,4 +1,4 @@
-const { db } = require('../../config/firebase-admin');
+const { db } = require('../../config/mongodb');
 
 async function getTickets(departmentId, status) {
   let query = db.collection('maintenanceTickets').orderBy('createdAt', 'desc');
