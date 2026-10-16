@@ -12,12 +12,10 @@ const ROLE_OPTIONS = [
 ];
 
 const DEPARTMENT_OPTIONS = [
+  { value: 'technical_office', label: 'المكتب الفني' },
   { value: 'production', label: 'إدارة الإنتاج' },
-  { value: 'quality', label: 'مراقبة الجودة' },
   { value: 'maintenance', label: 'الصيانة والتشغيل' },
   { value: 'planning_warehouse', label: 'التخطيط والمستودعات' },
-  { value: 'technical_office', label: 'المكتب الفني' },
-  { value: 'safety', label: 'السلامة والصحة المهنية' },
   { value: 'finance', label: 'الحسابات والمالية' }
 ];
 

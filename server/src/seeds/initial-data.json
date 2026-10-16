@@ -10,12 +10,12 @@
       "isActive": true
     },
     {
-      "id": "user-quality",
-      "email": "quality@mavex.com",
-      "name": "م. طارق محمود",
+      "id": "user-office",
+      "email": "office@mavex.com",
+      "name": "م. أحمد حسن",
       "role": "manager",
-      "departmentId": "quality",
-      "title": "مدير مراقبة الجودة",
+      "departmentId": "technical_office",
+      "title": "مدير المكتب الفني",
       "isActive": true
     },
     {
@@ -37,12 +37,21 @@
       "isActive": true
     },
     {
-      "id": "user-safety",
-      "email": "safety@mavex.com",
-      "name": "أ. محمود فوزي",
+      "id": "user-finance",
+      "email": "finance@mavex.com",
+      "name": "أ. حسام فوزي",
       "role": "manager",
-      "departmentId": "safety",
-      "title": "مسؤول السلامة والصحة المهنية",
+      "departmentId": "finance",
+      "title": "مدير الحسابات والمالية",
+      "isActive": true
+    },
+    {
+      "id": "user-warehouse",
+      "email": "warehouse@mavex.com",
+      "name": "م. كريم سامي",
+      "role": "manager",
+      "departmentId": "warehouse",
+      "title": "مدير التخطيط والمستودعات",
       "isActive": true
     }
   ],
@@ -81,27 +90,6 @@
       "managerName": "أ. حسام فوزي",
       "performancePercentage": 90,
       "color": "blue"
-    },
-    {
-      "departmentId": "quality",
-      "name": "مراقبة الجودة",
-      "managerName": "م. طارق محمود",
-      "performancePercentage": 95,
-      "color": "green"
-    },
-    {
-      "departmentId": "safety",
-      "name": "السلامة والصحة المهنية",
-      "managerName": "أ. محمود فوزي",
-      "performancePercentage": 94,
-      "color": "cyan"
-    },
-    {
-      "departmentId": "violations",
-      "name": "إدارة المخالفات والرقابة",
-      "managerName": "أ. علاء إبراهيم",
-      "performancePercentage": 86,
-      "color": "red"
     }
   ],
   "departmentMonthlyReports": [

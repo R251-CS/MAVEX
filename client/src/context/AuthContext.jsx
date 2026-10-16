@@ -3,9 +3,7 @@ import { authService } from '../services/authService';
 
 export const DEPARTMENT_ROUTES = {
   production: '/production',
-  quality: '/quality',
   maintenance: '/maintenance',
-  safety: '/safety',
   planning_warehouse: '/planning-warehouse',
   warehouse: '/planning-warehouse',
   planning: '/planning-warehouse',
@@ -29,12 +27,12 @@ export const SEED_ACCOUNTS = [
     title: 'الإدارة العليا'
   },
   {
-    email: 'quality@mavex.com',
-    password: 'Quality@123456',
-    name: 'م. طارق محمود',
+    email: 'office@mavex.com',
+    password: 'Office@123456',
+    name: 'م. أحمد حسن',
     role: 'department_manager',
-    departmentId: 'quality',
-    title: 'مدير مراقبة الجودة'
+    departmentId: 'technical_office',
+    title: 'مدير المكتب الفني'
   },
   {
     email: 'production@mavex.com',
@@ -53,14 +51,6 @@ export const SEED_ACCOUNTS = [
     title: 'مدير الصيانة'
   },
   {
-    email: 'safety@mavex.com',
-    password: 'Safety@123456',
-    name: 'أ. محمود فوزي',
-    role: 'department_manager',
-    departmentId: 'safety',
-    title: 'مسؤول السلامة والصحة المهنية'
-  },
-  {
     email: 'finance@mavex.com',
     password: 'Finance@123456',
     name: 'أ. حسام فوزي',
@@ -75,14 +65,6 @@ export const SEED_ACCOUNTS = [
     role: 'department_manager',
     departmentId: 'warehouse',
     title: 'مدير التخطيط والمستودعات'
-  },
-  {
-    email: 'office@mavex.com',
-    password: 'Office@123456',
-    name: 'م. أحمد حسن',
-    role: 'department_manager',
-    departmentId: 'technical_office',
-    title: 'مدير المكتب الفني'
   }
 ];
 

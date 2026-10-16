@@ -40,38 +40,11 @@ export const mockDashboardData = {
     {
       departmentId: 'finance',
       name: 'الحسابات والمالية',
-      managerName: 'أ. رامي سالم',
-      performancePercentage: 88,
+      managerName: 'أ. حسام فوزي',
+      performancePercentage: 90,
       route: '/finance',
-      color: 'green',
+      color: 'blue',
       metrics: { income: '630,000 ج.م', expenses: '195,000 ج.م' }
-    },
-    {
-      departmentId: 'quality',
-      name: 'مراقبة الجودة',
-      managerName: 'م. طارق محمود',
-      performancePercentage: 95,
-      route: '/quality',
-      color: 'green',
-      metrics: { acceptance: '95%', inspections: 28 }
-    },
-    {
-      departmentId: 'safety',
-      name: 'السلامة والصحة المهنية',
-      managerName: 'أ. محمود فوزي',
-      performancePercentage: 94,
-      route: '/safety',
-      color: 'cyan',
-      metrics: { zeroIncidentsDays: 142, auditsScore: '92%' }
-    },
-    {
-      departmentId: 'violations',
-      name: 'إدارة المخالفات والرقابة',
-      managerName: 'أ. علاء إبراهيم',
-      performancePercentage: 86,
-      route: '/violations-admin',
-      color: 'red',
-      metrics: { activeViolations: 3, resolved: 18 }
     }
   ]
 };

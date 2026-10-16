@@ -8,13 +8,11 @@ const { normalizeRole } = require('../../shared/constants');
  */
 const SEED_FALLBACK_PASSWORDS = {
   'admin@mavex.com': ['admin123', 'Admin@123456'],
-  'quality@mavex.com': ['qual123', 'Quality@123456'],
+  'office@mavex.com': ['office123', 'Office@123456'],
   'production@mavex.com': ['prod123', 'Production@123456'],
   'maintenance@mavex.com': ['maint123', 'Maintenance@123456'],
-  'safety@mavex.com': ['safe123', 'Safety@123456'],
   'finance@mavex.com': ['fin123', 'Finance@123456'],
-  'warehouse@mavex.com': ['ware123', 'Warehouse@123456'],
-  'office@mavex.com': ['office123', 'Office@123456']
+  'warehouse@mavex.com': ['ware123', 'Warehouse@123456']
 };
 
 class AuthService {

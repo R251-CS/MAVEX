@@ -5,10 +5,7 @@ import {
   Factory,
   Boxes,
   Wrench,
-  DollarSign,
-  CheckCircle2,
-  ShieldCheck,
-  AlertOctagon
+  DollarSign
 } from 'lucide-react';
 
 const DEPT_ICONS = {
@@ -16,10 +13,7 @@ const DEPT_ICONS = {
   production: { icon: Factory, route: '/production', color: 'cyan' },
   planning_warehouse: { icon: Boxes, route: '/planning-warehouse', color: 'green' },
   maintenance: { icon: Wrench, route: '/maintenance', color: 'amber' },
-  finance: { icon: DollarSign, route: '/finance', color: 'green' },
-  quality: { icon: CheckCircle2, route: '/quality', color: 'green' },
-  safety: { icon: ShieldCheck, route: '/safety', color: 'cyan' },
-  violations: { icon: AlertOctagon, route: '/violations-admin', color: 'red' }
+  finance: { icon: DollarSign, route: '/finance', color: 'green' }
 };
 
 
