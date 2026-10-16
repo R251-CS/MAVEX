@@ -1,12 +1,35 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { GlassCard, Button, TextField } from '../../components/common';
-import { Lock, Mail, User, ShieldAlert, UserPlus, ArrowRight } from 'lucide-react';
+import { GlassCard, Button, TextField, SelectField } from '../../components/common';
+import { Lock, Mail, User, ShieldAlert, UserPlus, ArrowRight, Briefcase, Building } from 'lucide-react';
 import { useToast } from '../../components/common/Toast';
 
+// الأدوار المسموح بإنشائها عبر التسجيل (يُستثنى الأدمن تماماً لأسباب أمنية)
+const ROLE_OPTIONS = [
+  { value: 'department_member', label: 'عضو / فني تشغيل بالقسم (Department Member)' },
+  { value: 'department_manager', label: 'مدير قسم صناعي / تنفيذي (Department Manager)' }
+];
+
+const DEPARTMENT_OPTIONS = [
+  { value: 'production', label: 'إدارة الإنتاج' },
+  { value: 'quality', label: 'مراقبة الجودة' },
+  { value: 'maintenance', label: 'الصيانة والتشغيل' },
+  { value: 'planning_warehouse', label: 'التخطيط والمستودعات' },
+  { value: 'technical_office', label: 'المكتب الفني' },
+  { value: 'safety', label: 'السلامة والصحة المهنية' },
+  { value: 'finance', label: 'الحسابات والمالية' }
+];
+
 export default function Register() {
-  const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '' });
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    role: 'department_member',
+    departmentId: 'production'
+  });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [globalError, setGlobalError] = useState('');
@@ -21,6 +44,10 @@ export default function Register() {
       newErrors.name = 'الاسم يجب أن يكون 3 أحرف على الأقل';
     if (!form.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
       newErrors.email = 'البريد الإلكتروني غير صالح';
+    if (!form.role)
+      newErrors.role = 'يرجى تحديد الدور الوظيفي';
+    if (!form.departmentId)
+      newErrors.departmentId = 'يرجى اختيار القسم التابع له';
     if (!form.password || form.password.length < 6)
       newErrors.password = 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
     if (form.password !== form.confirmPassword)
@@ -43,9 +70,15 @@ export default function Register() {
 
     try {
       if (register) {
-        await register(form.email, form.password, form.name.trim());
+        await register(
+          form.email,
+          form.password,
+          form.name.trim(),
+          form.role,
+          form.departmentId
+        );
       }
-      addToast('تم إنشاء الحساب بنجاح! مرحباً بك', 'success');
+      addToast('تم إنشاء الحساب بنجاح! مرحباً بك في MAVEX', 'success');
       navigate('/');
     } catch (err) {
       setGlobalError(err.message || 'فشل إنشاء الحساب. حاول مرة أخرى.');
@@ -60,33 +93,33 @@ export default function Register() {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      padding: '1.5rem',
-      background: 'radial-gradient(circle at top right, rgba(139, 92, 246, 0.15), transparent 60%), radial-gradient(circle at bottom left, rgba(59, 130, 246, 0.1), transparent 60%), var(--bg-app)'
+      padding: '2rem 1.5rem',
+      background: 'radial-gradient(circle at top right, rgba(25, 91, 77, 0.15), transparent 60%), radial-gradient(circle at bottom left, rgba(39, 132, 232, 0.1), transparent 60%), var(--bg-app)'
     }}>
-      <GlassCard glow="purple" style={{ maxWidth: '480px', width: '100%', padding: '2.5rem 2rem' }}>
+      <GlassCard glow="blue" style={{ maxWidth: '520px', width: '100%', padding: '2.5rem 2rem' }}>
         {/* Header */}
-        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+        <div style={{ textAlign: 'center', marginBottom: '1.75rem' }}>
           <div style={{
             display: 'inline-flex',
             width: '54px',
             height: '54px',
             borderRadius: 'var(--radius-lg)',
-            background: 'linear-gradient(135deg, var(--accent-purple), var(--accent-blue))',
+            background: 'var(--gradient-primary)',
             color: '#fff',
             alignItems: 'center',
             justifyContent: 'center',
             fontSize: '1.5rem',
-            fontWeight: 800,
+            fontWeight: 900,
             marginBottom: '1rem',
-            boxShadow: '0 4px 15px rgba(139, 92, 246, 0.4)'
+            boxShadow: '0 4px 15px rgba(25, 91, 77, 0.3)'
           }}>
             M
           </div>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-main)', margin: '0 0 0.5rem' }}>
-            إنشاء حساب جديد
+          <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--color-text-primary)', margin: '0 0 0.5rem' }}>
+            إنشاء حساب مستخدم جديد
           </h1>
-          <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', margin: 0 }}>
-            انضم إلى نظام MAVEX لإدارة العمليات الصناعية
+          <p style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)', margin: 0 }}>
+            انضم إلى فريق العمل بنظام MAVEX لإدارة المنشآت الصناعية
           </p>
         </div>
 
@@ -96,10 +129,11 @@ export default function Register() {
             display: 'flex',
             alignItems: 'center',
             gap: '0.5rem',
-            padding: '0.75rem',
+            padding: '0.75rem 1rem',
             borderRadius: 'var(--radius-md)',
-            background: 'rgba(239, 68, 68, 0.15)',
-            color: 'var(--accent-red)',
+            background: 'var(--color-danger-bg)',
+            border: '1px solid var(--color-danger-border)',
+            color: 'var(--color-danger)',
             fontSize: '0.875rem',
             marginBottom: '1.25rem'
           }}>
@@ -113,7 +147,7 @@ export default function Register() {
             label="الاسم الكامل"
             type="text"
             icon={User}
-            placeholder="محمد أحمد"
+            placeholder="مثال: م. أحمد عبد العزيز"
             value={form.name}
             onChange={handleChange('name')}
             error={errors.name}
@@ -122,13 +156,34 @@ export default function Register() {
           />
 
           <TextField
-            label="البريد الإلكتروني"
+            label="البريد الإلكتروني المهني"
             type="email"
             icon={Mail}
-            placeholder="user@mavex.com"
+            placeholder="engineer@mavex.com"
             value={form.email}
             onChange={handleChange('email')}
             error={errors.email}
+            required
+          />
+
+          {/* اختيار الدور الوظيفي - مستثنى منه الأدمن */}
+          <SelectField
+            label="الدور الوظيفي والصلاحية"
+            value={form.role}
+            onChange={handleChange('role')}
+            options={ROLE_OPTIONS}
+            error={errors.role}
+            required
+            helperText="ملاحظة: صلاحية مسؤول النظام (أدمن) تُمنح حصرياً من الإدارة العليا"
+          />
+
+          {/* اختيار القسم الصناعي التابع له */}
+          <SelectField
+            label="القسم / الإدارة الصناعية"
+            value={form.departmentId}
+            onChange={handleChange('departmentId')}
+            options={DEPARTMENT_OPTIONS}
+            error={errors.departmentId}
             required
           />
 
@@ -163,10 +218,10 @@ export default function Register() {
             style={{
               width: '100%',
               marginTop: '1.5rem',
-              background: 'linear-gradient(135deg, var(--accent-purple), var(--accent-blue))'
+              padding: '0.875rem'
             }}
           >
-            إنشاء الحساب
+            إتمام إنشاء الحساب
           </Button>
         </form>
 
@@ -175,16 +230,16 @@ export default function Register() {
           textAlign: 'center',
           marginTop: '1.5rem',
           paddingTop: '1.5rem',
-          borderTop: '1px solid var(--border-subtle)',
+          borderTop: '1px solid var(--color-border)',
           fontSize: '0.875rem',
-          color: 'var(--text-secondary)'
+          color: 'var(--color-text-secondary)'
         }}>
-          لديك حساب بالفعل؟{' '}
+          لديك حساب مسجل بالفعل؟{' '}
           <Link
             to="/login"
             style={{
-              color: 'var(--accent-blue)',
-              fontWeight: 600,
+              color: 'var(--color-primary)',
+              fontWeight: 700,
               textDecoration: 'none',
               display: 'inline-flex',
               alignItems: 'center',

@@ -85,6 +85,11 @@ class AuthService {
       throw new BadRequestError('كلمة المرور يجب ألا تقل عن 6 أحرف');
     }
 
+    const normalizedRole = normalizeRole(role);
+    if (normalizedRole === 'admin') {
+      throw new BadRequestError('غير مصرح بإنشاء حساب مسؤول نظام (أدمن) عبر التسجيل الذاتي');
+    }
+
     const cleanEmail = email.trim().toLowerCase();
     const existing = await authRepository.findUserByEmail(cleanEmail);
     if (existing) {
