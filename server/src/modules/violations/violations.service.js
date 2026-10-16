@@ -6,16 +6,36 @@ async function listViolations(month) {
 }
 
 async function recordViolation(data) {
-  if (!data.title || !data.departmentId) {
-    throw new BadRequestError('عنوان المخالفة والقسم المعني حقول إجبارية');
+  const title = data.title || data.description;
+  const departmentId = data.departmentId || data.dept;
+
+  if (!title || !departmentId) {
+    throw new BadRequestError('عنوان أو وصف المخالفة والقسم المعني حقول إجبارية');
   }
+
   return await violationsRepository.createViolation({
     ...data,
+    title,
+    departmentId,
     month: data.month || new Date().toISOString().slice(0, 7)
   });
 }
 
+
+async function modifyViolation(id, data) {
+  if (!id) {
+    throw new BadRequestError('معرف المخالفة مطلوب');
+  }
+  const updated = await violationsRepository.updateViolation(id, data);
+  if (!updated) {
+    throw new BadRequestError('المخالفة غير موجودة');
+  }
+  return updated;
+}
+
 module.exports = {
   listViolations,
-  recordViolation
+  recordViolation,
+  modifyViolation
 };
+

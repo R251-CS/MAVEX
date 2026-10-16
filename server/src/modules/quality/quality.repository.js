@@ -3,7 +3,7 @@ const initialData = require('../../seeds/initial-data.json');
 
 async function getQualityEvents(month) {
   try {
-    if (db && process.env.FIREBASE_PRIVATE_KEY) {
+    if (db) {
       let query = db.collection('qualityEvents').orderBy('date', 'desc');
       if (month) {
         query = query.where('month', '==', month);
@@ -16,7 +16,7 @@ async function getQualityEvents(month) {
       if (events.length > 0) return events;
     }
   } catch (err) {
-    console.warn('Firestore getQualityEvents fallback:', err.message);
+    console.warn('Database getQualityEvents fallback:', err.message);
   }
 
   if (month) {
@@ -26,7 +26,7 @@ async function getQualityEvents(month) {
 }
 
 async function addQualityEvent(data) {
-  if (db && process.env.FIREBASE_PRIVATE_KEY) {
+  if (db) {
     const ref = await db.collection('qualityEvents').add({
       ...data,
       createdAt: new Date().toISOString()

@@ -2,7 +2,6 @@ import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AppShell } from './components/layout';
 import { ProtectedRoute } from './components/common/ProtectedRoute';
-import { CheckCircle2, ShieldAlert, AlertOctagon } from 'lucide-react';
 
 // Lazy load pages for performance & instant loading
 const Dashboard = lazy(() => import('./pages/Dashboard/Dashboard'));
@@ -11,10 +10,12 @@ const Production = lazy(() => import('./pages/Production/Production'));
 const PlanningWarehouse = lazy(() => import('./pages/PlanningWarehouse/PlanningWarehouse'));
 const Maintenance = lazy(() => import('./pages/Maintenance/Maintenance'));
 const Finance = lazy(() => import('./pages/Finance/Finance'));
+const Quality = lazy(() => import('./pages/Quality/Quality'));
+const Safety = lazy(() => import('./pages/Safety/Safety'));
+const ViolationsAdmin = lazy(() => import('./pages/ViolationsAdmin/ViolationsAdmin'));
 const NotFound = lazy(() => import('./pages/NotFound/NotFound'));
 const Login = lazy(() => import('./pages/Auth/Login'));
 const Register = lazy(() => import('./pages/Auth/Register'));
-const ComingSoon = lazy(() => import('./pages/ComingSoon/ComingSoon'));
 
 const PageLoader = () => (
   <div style={{
@@ -35,11 +36,11 @@ export default function App() {
     <BrowserRouter>
       <Suspense fallback={<PageLoader />}>
         <Routes>
-          {/* Public Routes */}
+          {/* Public Authentication Routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
-          {/* Protected Routes - ProtectedRoute يتحقق من المصادقة ثم يعرض AppShell */}
+          {/* Protected Routes - Verified authentication wrapper */}
           <Route element={<ProtectedRoute><AppShell /></ProtectedRoute>}>
             <Route path="/" element={<Dashboard />} />
             <Route path="/technical-office" element={<TechnicalOffice />} />
@@ -47,11 +48,18 @@ export default function App() {
             <Route path="/planning-warehouse" element={<PlanningWarehouse />} />
             <Route path="/maintenance" element={<Maintenance />} />
             <Route path="/finance" element={<Finance />} />
+            <Route path="/quality" element={<Quality />} />
+            <Route path="/safety" element={<Safety />} />
 
-            {/* Disabled sections - show Coming Soon */}
-            <Route path="/quality" element={<ComingSoon title="مراقبة الجودة" icon={CheckCircle2} />} />
-            <Route path="/safety" element={<ComingSoon title="السلامة والصحة المهنية" icon={ShieldAlert} />} />
-            <Route path="/violations-admin" element={<ComingSoon title="إدارة المخالفات" icon={AlertOctagon} />} />
+            {/* Admin-only restricted section */}
+            <Route 
+              path="/violations-admin" 
+              element={
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <ViolationsAdmin />
+                </ProtectedRoute>
+              } 
+            />
 
             <Route path="*" element={<NotFound />} />
           </Route>
@@ -60,3 +68,4 @@ export default function App() {
     </BrowserRouter>
   );
 }
+

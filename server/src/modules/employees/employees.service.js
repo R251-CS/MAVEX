@@ -1,5 +1,6 @@
 const employeesRepository = require('./employees.repository');
-const { BadRequestError } = require('../../shared/errors');
+const { BadRequestError, NotFoundError, ForbiddenError } = require('../../shared/errors');
+const { ROLES, normalizeRole } = require('../../shared/constants');
 
 async function listDepartmentEmployeesWithMetrics(departmentId, month) {
   if (!departmentId) {
@@ -37,10 +38,23 @@ async function addEmployee(data) {
   return await employeesRepository.createEmployee(data);
 }
 
-async function removeEmployee(employeeId) {
+async function removeEmployee(employeeId, currentUser = null) {
   if (!employeeId) {
     throw new BadRequestError('معرف الموظف مطلوب');
   }
+
+  const employee = await employeesRepository.getEmployeeById(employeeId);
+  if (!employee) {
+    throw new NotFoundError('الموظف غير موجود');
+  }
+
+  if (currentUser) {
+    const role = normalizeRole(currentUser.role);
+    if (role !== ROLES.ADMIN && currentUser.departmentId && employee.departmentId !== currentUser.departmentId) {
+      throw new ForbiddenError('غير مصرح لك بحذف موظف تابع لقسم آخر');
+    }
+  }
+
   return await employeesRepository.deleteEmployee(employeeId);
 }
 
@@ -49,3 +63,4 @@ module.exports = {
   addEmployee,
   removeEmployee
 };
+

@@ -17,9 +17,14 @@ import {
   Clock, 
   MessageSquare, 
   ArrowRight,
-  Sparkles
+  Sparkles,
+  Lock
 } from 'lucide-react';
 import { useToast } from '../../components/common/Toast';
+import productionService from '../../services/productionService';
+import warehouseService from '../../services/warehouseService';
+import employeesService from '../../services/employeesService';
+import dashboardService from '../../services/dashboardService';
 
 const STAGE_ICONS = {
   material_receipt: Layers,
@@ -122,27 +127,54 @@ export default function Production() {
   const [newWorker, setNewWorker] = useState({ name: '', machine: '', basicSalary: 5000, incentives: 1000 });
   const [deleteWorkerId, setDeleteWorkerId] = useState(null);
 
-  // Fetch live orders from backend
+  // Fetch live orders and employees from backend
   useEffect(() => {
-    fetch('/api/v1/production/orders', {
-      headers: { 'x-dev-user': '1' }
-    })
-      .then(res => res.json())
-      .then(res => {
-        if (res?.data?.orders && res.data.orders.length > 0) {
-          setOrders(res.data.orders);
+    let isMounted = true;
+    productionService.getOrders(selectedMonth)
+      .then(liveOrders => {
+        if (isMounted && liveOrders && liveOrders.length > 0) {
+          setOrders(liveOrders);
         }
       })
       .catch(() => {});
-  }, []);
 
-  const handleKpiChange = (key, value) => {
-    setKpis(prev => ({ ...prev, [key]: value }));
-  };
+    employeesService.getEmployeesByDepartment('production')
+      .then(liveWorkers => {
+        if (isMounted && liveWorkers && liveWorkers.length > 0) {
+          setWorkers(liveWorkers.map(w => ({
+            id: w.id,
+            name: w.name,
+            machine: w.title || 'خط التجميع العام',
+            basicSalary: w.basicSalary || 5000,
+            incentives: w.incentives || 1000,
+            deductions: w.deductions || 0,
+            errors: 0
+          })));
+        }
+      })
+    dashboardService.getDashboard(selectedMonth)
+      .then(res => {
+        const data = res?.data || res;
+        const dept = (data?.departments || []).find(d => d.departmentId === 'production');
+        if (isMounted && dept?.kpis) {
+          setKpis({
+            efficiency: Number(dept.kpis.efficiency) || 88,
+            waste: Number(dept.kpis.waste) || 12,
+            commitment: Number(dept.kpis.commitment) || 90
+          });
+        }
+      })
+      .catch(() => {});
 
-  const handleCreateOrder = (e) => {
+    return () => { isMounted = false; };
+  }, [selectedMonth]);
+
+  const handleCreateOrder = async (e) => {
     e.preventDefault();
     if (!newOrder.productName.trim()) return;
+
+    // Strict Business Logic: Serial codes are immutable and system-generated
+    const autoCode = `WO-2026-${Math.floor(100 + Math.random() * 900)}`;
 
     const stages = [
       { key: 'material_receipt', name: 'استلام الخامات', status: 'completed', completedAt: new Date().toISOString().slice(0, 10), operator: 'أمين المخزن' },
@@ -153,10 +185,10 @@ export default function Production() {
 
     const orderObj = {
       id: `ord-${Date.now()}`,
-      code: newOrder.code.trim() || `WO-${Date.now().toString().slice(-4)}`,
+      code: autoCode,
       productName: newOrder.productName.trim(),
       category: newOrder.category,
-      rawMaterials: newOrder.rawMaterials.trim() || 'خامات معيارية',
+      rawMaterials: newOrder.rawMaterials.trim() || 'صاج مسحوب ومعادن مطابقة',
       currentStage: 'laser',
       status: 'in_progress',
       delayReason: '',
@@ -166,16 +198,30 @@ export default function Production() {
 
     setOrders(prev => [orderObj, ...prev]);
 
-    // Send to backend
-    fetch('/api/v1/production/orders', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-dev-user': '1' },
-      body: JSON.stringify(orderObj)
-    }).catch(() => {});
+    try {
+      await productionService.createOrder(orderObj);
+      
+      // Cross-Department Flow: Automatically dispatch raw materials in Warehouse
+      try {
+        await warehouseService.recordMovement({
+          itemId: 'item-1',
+          warehouseId: 'wh-main',
+          type: 'OUT',
+          quantity: 2.5,
+          reason: `صرف خامات وتجهيزات لأمر التشغيل (${autoCode})`,
+          referenceId: autoCode
+        });
+      } catch (e) {
+        console.warn('Warehouse auto-dispatch notice:', e.message);
+      }
+
+      addToast(`تم إصدار أمر التشغيل الرسمي (${autoCode}) وقيد صرف الخامات بالمستودع ✓`, 'success');
+    } catch {
+      addToast('تم حفظ أمر التشغيل محلياً بنجاح', 'info');
+    }
 
     setIsNewOrderOpen(false);
     setNewOrder({ code: '', productName: '', category: 'لوحات تحكم كهربائية', rawMaterials: '' });
-    addToast('تم إنشاء أمر التشغيل وتحديد مراحله وخاماته بنجاح', 'success');
   };
 
   const openStageModal = (order, stageKey) => {
@@ -190,7 +236,7 @@ export default function Production() {
     setIsStageModalOpen(true);
   };
 
-  const handleSaveStage = (e) => {
+  const handleSaveStage = async (e) => {
     e.preventDefault();
     if (!selectedOrder) return;
 
@@ -218,18 +264,18 @@ export default function Production() {
 
     setOrders(prev => prev.map(o => o.id === selectedOrder.id ? updatedOrder : o));
 
-    fetch(`/api/v1/production/orders/${selectedOrder.id}/stages/${stageForm.stageKey}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json', 'x-dev-user': '1' },
-      body: JSON.stringify({
+    try {
+      await productionService.updateStage(selectedOrder.id, stageForm.stageKey, {
         status: stageForm.status,
         delayReason: stageForm.delayReason,
         delayComment: stageForm.delayComment
-      })
-    }).catch(() => {});
+      });
+      addToast('تم تحديث مرحلة التشغيل وسجل المتابعة بنجاح ✓', 'success');
+    } catch {
+      addToast('تم حفظ تقدم المرحلة محلياً', 'info');
+    }
 
     setIsStageModalOpen(false);
-    addToast('تم تحديث مرحلة التشغيل وملاحظات التأخير بنجاح', 'success');
   };
 
   const getNextStageKey = (current) => {
@@ -239,24 +285,33 @@ export default function Production() {
     return 'finishing_paint';
   };
 
-  const handleAddWorker = (e) => {
+  const handleAddWorker = async (e) => {
     e.preventDefault();
     if (!newWorker.name.trim()) return;
-    setWorkers(prev => [
-      ...prev,
-      {
-        id: `wrk-${Date.now()}`,
-        name: newWorker.name.trim(),
-        errors: 0,
-        machine: newWorker.machine.trim() || 'خط التجميع العام',
-        basicSalary: Number(newWorker.basicSalary) || 5000,
-        incentives: Number(newWorker.incentives) || 1000,
-        deductions: 0
-      }
-    ]);
+
+    const workerObj = {
+      id: `wrk-${Date.now()}`,
+      name: newWorker.name.trim(),
+      machine: newWorker.machine.trim() || 'خط التجميع العام',
+      title: newWorker.machine.trim() || 'فني تشغيل',
+      department: 'production',
+      basicSalary: Number(newWorker.basicSalary) || 5000,
+      incentives: Number(newWorker.incentives) || 1000,
+      deductions: 0,
+      errors: 0
+    };
+
+    setWorkers(prev => [...prev, workerObj]);
+
+    try {
+      await employeesService.createEmployee(workerObj);
+      addToast('تمت إضافة الفني وربطه بمسير الرواتب بنجاح', 'success');
+    } catch {
+      addToast('تمت إضافة الفني محلياً', 'info');
+    }
+
     setNewWorker({ name: '', machine: '', basicSalary: 5000, incentives: 1000 });
     setIsAddWorkerOpen(false);
-    addToast('تمت إضافة الفني وحساب راتبه بنجاح', 'success');
   };
 
   return (
@@ -508,7 +563,6 @@ export default function Production() {
             { key: 'waste', label: 'نسبة الهالك (تقليل الهدر)', value: kpis.waste, color: 'amber' },
             { key: 'commitment', label: 'الالتزام بمواعيد التسليم المحددة', value: kpis.commitment, color: 'green' }
           ]}
-          onKpiChange={handleKpiChange}
         />
       )}
 
@@ -519,12 +573,24 @@ export default function Production() {
         title="إنشاء أمر تشغيل وتصنيع جديد"
       >
         <form onSubmit={handleCreateOrder}>
-          <TextField
-            label="كود أمر التشغيل"
-            placeholder="مثال: WO-2026-104"
-            value={newOrder.code}
-            onChange={(e) => setNewOrder({ ...newOrder, code: e.target.value })}
-          />
+          <div style={{
+            padding: '0.75rem 1rem',
+            background: 'var(--color-surface-hover)',
+            borderRadius: 'var(--radius-md)',
+            border: '1px solid var(--color-border)',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '1rem'
+          }}>
+            <div>
+              <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', display: 'block' }}>رقم أمر التشغيل الصناعي الرسمي</span>
+              <strong style={{ color: 'var(--color-cyan)', fontSize: '0.9375rem', fontFamily: 'monospace' }}>
+                WO-2026-AUTO (🔒 كود تشغيل معتمد ومحمي)
+              </strong>
+            </div>
+            <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>غير قابل للتعديل</span>
+          </div>
           <TextField
             label="اسم المنتج المطلوب تصنيعه"
             placeholder="مثال: كبائن توزيع كهربائية 3 فاز"

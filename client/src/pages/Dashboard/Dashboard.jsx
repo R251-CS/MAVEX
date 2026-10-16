@@ -106,7 +106,9 @@ export default function Dashboard() {
           <div>
             <span style={{ fontSize: '0.8125rem', color: 'var(--color-text-secondary)', fontWeight: 600 }}>أوامر الإنتاج النشطة</span>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.375rem', marginTop: '0.125rem' }}>
-              <span style={{ fontSize: '1.625rem', fontWeight: 900, color: 'var(--color-text-primary)', lineHeight: 1 }}>14 أمر</span>
+              <span style={{ fontSize: '1.625rem', fontWeight: 900, color: 'var(--color-text-primary)', lineHeight: 1 }}>
+                {data?.highlights?.activeOrdersCount ?? 14} أمر
+              </span>
               <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>قيد التصنيع</span>
             </div>
           </div>
@@ -129,7 +131,9 @@ export default function Dashboard() {
           <div>
             <span style={{ fontSize: '0.8125rem', color: 'var(--color-text-secondary)', fontWeight: 600 }}>مؤشر جودة الفحص</span>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.375rem', marginTop: '0.125rem' }}>
-              <span style={{ fontSize: '1.625rem', fontWeight: 900, color: 'var(--color-text-primary)', lineHeight: 1 }}>95.8%</span>
+              <span style={{ fontSize: '1.625rem', fontWeight: 900, color: 'var(--color-text-primary)', lineHeight: 1 }}>
+                {data?.highlights?.qualityRate ?? 95.8}%
+              </span>
               <span style={{ fontSize: '0.75rem', color: 'var(--color-success)', fontWeight: 700 }}>اجتياز تام</span>
             </div>
           </div>
@@ -152,12 +156,15 @@ export default function Dashboard() {
           <div>
             <span style={{ fontSize: '0.8125rem', color: 'var(--color-text-secondary)', fontWeight: 600 }}>جاهزية الماكينات</span>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.375rem', marginTop: '0.125rem' }}>
-              <span style={{ fontSize: '1.625rem', fontWeight: 900, color: 'var(--color-text-primary)', lineHeight: 1 }}>98.5%</span>
+              <span style={{ fontSize: '1.625rem', fontWeight: 900, color: 'var(--color-text-primary)', lineHeight: 1 }}>
+                {data?.highlights?.machineUptime ?? 98.5}%
+              </span>
               <span style={{ fontSize: '0.75rem', color: 'var(--color-primary)', fontWeight: 700 }}>تشغيل مستمر</span>
             </div>
           </div>
         </GlassCard>
       </div>
+
 
       {/* ─── Center Visual Centerpiece: Gauge + Comparative Chart ─── */}
       <div style={{
@@ -200,9 +207,10 @@ export default function Dashboard() {
           borderRadius: 'var(--radius-full)',
           border: '1px solid var(--color-border)'
         }}>
-          <span>5 أقسام تشغيلية</span>
+          <span>{departments.length || 8} أقسام ووحدات تشغيلية</span>
         </div>
       </div>
+
 
       <DepartmentGrid departments={departments} />
     </PageContainer>

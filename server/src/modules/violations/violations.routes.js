@@ -13,4 +13,8 @@ router.get('/', violationsController.getViolations);
 // POST /api/v1/violations
 router.post('/', authorize([ROLES.ADMIN]), violationsController.createViolation);
 
+// PATCH /api/v1/violations/:id (e.g. status closed / assign action)
+router.patch('/:id', authorize([ROLES.ADMIN, ROLES.DEPARTMENT_MANAGER]), violationsController.updateViolation);
+
 module.exports = router;
+

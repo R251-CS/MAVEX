@@ -57,42 +57,47 @@ app.get('/', (req, res) => {
 // API version 1 root
 const apiV1Router = express.Router();
 
-// Health check endpoint with Firebase/Firestore status
+// Health check endpoint with MongoDB status
 apiV1Router.get('/health', async (req, res) => {
+  const { testConnection } = require('./config/mongodb');
+
   const healthData = {
-    uptime: process.uptime(),
+    uptime: Math.floor(process.uptime()),
     timestamp: new Date().toISOString(),
     service: 'Mavex API Gateway',
     version: 'v1',
-    environment: process.env.NODE_ENV || 'development',
-    database: { status: 'unknown', latency: null }
+    environment: process.env.NODE_ENV || 'production',
+    database: { status: 'unknown', provider: 'MongoDB' }
   };
 
-  // فحص اتصال Firestore
-  try {
-    const { db } = require('./config/firebase-admin');
-    if (db) {
-      const start = Date.now();
-      await db.collection('_health').limit(1).get();
-      healthData.database = {
-        status: 'connected',
-        provider: 'Firestore',
-        latency: `${Date.now() - start}ms`
-      };
-    } else {
-      healthData.database = { status: 'not_initialized', provider: 'Firestore' };
-    }
-  } catch (dbErr) {
+  const conn = await testConnection(3000);
+  if (conn.ok) {
     healthData.database = {
-      status: 'error',
-      provider: 'Firestore',
-      error: dbErr.code || dbErr.message
+      status: 'connected',
+      provider: 'MongoDB Database Server',
+      databaseName: conn.name,
+      host: conn.host,
+      latency: `${conn.latency}ms`
     };
+  } else {
+    healthData.database = {
+      status: 'disconnected',
+      provider: 'MongoDB Database Server',
+      error: conn.error || 'Database connection offline'
+    };
+    return res.status(503).json({
+      status: 'error',
+      message: 'MongoDB database is not connected',
+      data: healthData
+    });
   }
 
-  const httpStatus = healthData.database.status === 'error' ? 503 : 200;
-  res.status(httpStatus).json({ status: httpStatus === 200 ? 'success' : 'degraded', data: healthData });
+  res.status(200).json({
+    status: 'success',
+    data: healthData
+  });
 });
+
 
 // Register all modular monolith endpoints
 apiV1Router.use('/auth', authRoutes);

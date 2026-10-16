@@ -28,7 +28,7 @@ async function createEmployee(req, res, next) {
 async function deleteEmployee(req, res, next) {
   try {
     const { id } = req.params;
-    await employeesService.removeEmployee(id);
+    await employeesService.removeEmployee(id, req.user);
     res.status(200).json({
       status: 'success',
       message: 'تم حذف الموظف بنجاح'
@@ -37,6 +37,7 @@ async function deleteEmployee(req, res, next) {
     next(err);
   }
 }
+
 
 module.exports = {
   getEmployees,

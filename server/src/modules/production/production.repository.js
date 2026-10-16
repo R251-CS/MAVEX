@@ -3,7 +3,7 @@ const initialData = require('../../seeds/initial-data.json');
 
 async function getOrders(status) {
   try {
-    if (db && process.env.FIREBASE_PRIVATE_KEY) {
+    if (db) {
       let query = db.collection('productionOrders').orderBy('createdAt', 'desc');
       if (status) {
         query = query.where('status', '==', status);
@@ -14,7 +14,7 @@ async function getOrders(status) {
       if (orders.length > 0) return orders;
     }
   } catch (err) {
-    console.warn('Firestore getOrders fallback:', err.message);
+    console.warn('Database getOrders fallback:', err.message);
   }
 
   if (status) {
@@ -24,6 +24,16 @@ async function getOrders(status) {
 }
 
 async function getProducts() {
+  try {
+    if (db) {
+      const snapshot = await db.collection('products').get();
+      const products = [];
+      snapshot.forEach(doc => products.push({ id: doc.id, ...doc.data() }));
+      if (products.length > 0) return products;
+    }
+  } catch (err) {
+    console.warn('Database getProducts fallback:', err.message);
+  }
   return initialData.products || [];
 }
 
@@ -50,7 +60,7 @@ async function createOrder(data) {
     updatedAt: new Date().toISOString()
   };
 
-  if (db && process.env.FIREBASE_PRIVATE_KEY) {
+  if (db) {
     const ref = await db.collection('productionOrders').add(newOrder);
     const doc = await ref.get();
     return { id: doc.id, ...doc.data() };
@@ -62,7 +72,7 @@ async function createOrder(data) {
 }
 
 async function updateStage(orderId, stageKey, stageData) {
-  if (db && process.env.FIREBASE_PRIVATE_KEY) {
+  if (db) {
     const orderRef = db.collection('productionOrders').doc(orderId);
     return await db.runTransaction(async (transaction) => {
       const doc = await transaction.get(orderRef);

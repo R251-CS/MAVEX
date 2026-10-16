@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useMonth } from '../../context/MonthContext';
 import { PageContainer, PageHeader, GlassCard, Button, StatusBadge, DataTable, Modal, TextField, ConfirmDialog } from '../../components/common';
 import { DepartmentSummary } from '../../components/departments/DepartmentSummary';
 import { KpiPanel } from '../../components/departments/KpiPanel';
 import { Wrench, CheckCircle2, AlertTriangle, Plus, Activity, Trash2 } from 'lucide-react';
 import { useToast } from '../../components/common/Toast';
+import maintenanceService from '../../services/maintenanceService';
+import dashboardService from '../../services/dashboardService';
 
 const ORDER_TYPES = ['وقائية', 'دورية', 'طارئة', 'تصحيحية'];
 const MACHINES_LIST = [
@@ -48,11 +50,37 @@ export default function Maintenance() {
   });
   const [useCustomMachine, setUseCustomMachine] = useState(false);
 
-  const handleKpiChange = (key, value) => {
-    setKpis((prev) => ({ ...prev, [key]: value }));
-  };
+  useEffect(() => {
+    let isMounted = true;
+    maintenanceService.getTickets(selectedMonth).then(tickets => {
+      if (isMounted && tickets && tickets.length > 0) {
+        setWorkOrders(tickets.map(t => ({
+          id: t.id,
+          machine: t.machine || t.equipmentName || 'ماكينة عامة',
+          task: t.task || t.description || 'صيانة دورية',
+          type: t.type || 'وقائية',
+          status: t.status === 'resolved' || t.status === 'completed' ? 'completed' : 'in_progress',
+          date: t.date || t.createdAt?.slice(0, 10) || new Date().toISOString().slice(0, 10)
+        })));
+      }
+    });
 
-  const handleAddOrder = (e) => {
+    dashboardService.getDashboard(selectedMonth).then(res => {
+      const data = res?.data || res;
+      const dept = (data?.departments || []).find(d => d.departmentId === 'maintenance');
+      if (isMounted && dept?.kpis) {
+        setKpis({
+          uptime: parseFloat(dept.kpis.uptime) || 98.5,
+          preventive: Number(dept.kpis.preventive) || 92,
+          mttr: Number(dept.kpis.mttr) || 89
+        });
+      }
+    }).catch(() => {});
+
+    return () => { isMounted = false; };
+  }, [selectedMonth]);
+
+  const handleAddOrder = async (e) => {
     e.preventDefault();
     const machineVal = useCustomMachine ? form.customMachine.trim() : form.machine;
     if (!machineVal || !form.task.trim()) return;
@@ -67,10 +95,26 @@ export default function Maintenance() {
     };
 
     setWorkOrders(prev => [newOrder, ...prev]);
+
+    try {
+      await maintenanceService.createTicket({
+        machine: machineVal,
+        equipmentName: machineVal,
+        description: form.task.trim(),
+        task: form.task.trim(),
+        type: form.type,
+        status: form.status,
+        date: form.date,
+        month: selectedMonth
+      });
+      addToast('تم تسجيل أمر الصيانة وحفظه على النظام بنجاح ✓', 'success');
+    } catch {
+      addToast('تم حفظ أمر الصيانة محلياً', 'info');
+    }
+
     setIsAddOpen(false);
     setForm({ machine: MACHINES_LIST[0], task: '', type: 'وقائية', status: 'in_progress', date: new Date().toISOString().slice(0, 10), customMachine: '' });
     setUseCustomMachine(false);
-    addToast('تم تسجيل أمر الصيانة بنجاح', 'success');
   };
 
   const handleDelete = () => {
@@ -81,13 +125,19 @@ export default function Maintenance() {
     }
   };
 
-  const handleStatusToggle = (id) => {
-    setWorkOrders(prev => prev.map(w => {
-      if (w.id !== id) return w;
-      const next = w.status === 'completed' ? 'in_progress' : 'completed';
+  const handleStatusToggle = async (id) => {
+    const target = workOrders.find(w => w.id === id);
+    if (!target) return;
+    const next = target.status === 'completed' ? 'in_progress' : 'completed';
+
+    setWorkOrders(prev => prev.map(w => w.id === id ? { ...w, status: next } : w));
+
+    try {
+      await maintenanceService.updateTicketStatus(id, next === 'completed' ? 'resolved' : 'open');
       addToast(next === 'completed' ? 'تم إغلاق أمر الصيانة بنجاح ✓' : 'تم إعادة فتح أمر الصيانة', next === 'completed' ? 'success' : 'info');
-      return { ...w, status: next };
-    }));
+    } catch {
+      addToast(next === 'completed' ? 'تم إغلاق الأمر محلياً' : 'تم إعادة فتح الأمر محلياً', 'info');
+    }
   };
 
   const columns = [
@@ -246,7 +296,6 @@ export default function Maintenance() {
           { key: 'preventive', label: 'نسبة الالتزام بالصيانة الوقائية المجدولة', value: kpis.preventive, color: 'amber', unit: '%' },
           { key: 'mttr', label: 'سرعة الاستجابة وإصلاح الأعطال الطارئة', value: kpis.mttr, color: 'blue', unit: '%' }
         ]}
-        onKpiChange={handleKpiChange}
       />
 
       {/* Work Orders Log */}

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { 
   onAuthStateChanged, 
   signInWithEmailAndPassword, 
@@ -22,7 +22,7 @@ export const SEED_ACCOUNTS = [
     email: 'quality@mavex.com',
     password: 'Quality@123456',
     name: 'م. طارق محمود',
-    role: 'manager',
+    role: 'department_manager',
     departmentId: 'quality',
     title: 'مدير مراقبة الجودة'
   },
@@ -30,7 +30,7 @@ export const SEED_ACCOUNTS = [
     email: 'production@mavex.com',
     password: 'Production@123456',
     name: 'م. سامح عزت',
-    role: 'manager',
+    role: 'department_manager',
     departmentId: 'production',
     title: 'مدير الإنتاج'
   },
@@ -38,7 +38,7 @@ export const SEED_ACCOUNTS = [
     email: 'maintenance@mavex.com',
     password: 'Maintenance@123456',
     name: 'م. ياسر عبد الله',
-    role: 'manager',
+    role: 'department_manager',
     departmentId: 'maintenance',
     title: 'مدير الصيانة'
   },
@@ -46,31 +46,61 @@ export const SEED_ACCOUNTS = [
     email: 'safety@mavex.com',
     password: 'Safety@123456',
     name: 'أ. محمود فوزي',
-    role: 'manager',
+    role: 'department_manager',
     departmentId: 'safety',
     title: 'مسؤول السلامة والصحة المهنية'
+  },
+  {
+    email: 'finance@mavex.com',
+    password: 'Finance@123456',
+    name: 'أ. حسام فوزي',
+    role: 'department_manager',
+    departmentId: 'finance',
+    title: 'مدير الحسابات والمالية'
   }
 ];
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-  const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  // استرجاع جلسة الدخول المخزنة محلياً إن وجدت
-  useEffect(() => {
-    const savedUser = localStorage.getItem('mavex_auth_session');
-    if (savedUser) {
-      try {
+  // تهيئة الحالة مباشرة من الجلسة المخزنة محلياً لتفادي وميض إعادة التوجيه
+  const [user, setUser] = useState(() => {
+    try {
+      const savedUser = localStorage.getItem('mavex_auth_session');
+      if (savedUser) {
         const parsed = JSON.parse(savedUser);
-        setUser({ uid: parsed.uid, email: parsed.email, displayName: parsed.name });
-        setProfile(parsed);
-      } catch (e) {
-        console.error('Failed to parse saved auth session:', e);
+        return { uid: parsed.uid, email: parsed.email, displayName: parsed.name };
       }
+    } catch (e) {
+      console.error('Failed to parse saved auth session:', e);
     }
+    return null;
+  });
+
+  const [profile, setProfile] = useState(() => {
+    try {
+      const savedUser = localStorage.getItem('mavex_auth_session');
+      if (savedUser) {
+        return JSON.parse(savedUser);
+      }
+    } catch (e) {
+      console.error('Failed to parse saved profile:', e);
+    }
+    return null;
+  });
+
+  const [loading, setLoading] = useState(false);
+
+  // الاستماع لحدث انتهاء صلاحية الرمز الصادر من interceptor الشبكة
+  useEffect(() => {
+    const handleExpired = () => {
+      localStorage.removeItem('mavex_auth_session');
+      setUser(null);
+      setProfile(null);
+    };
+
+    window.addEventListener('mavex:auth_expired', handleExpired);
+    return () => window.removeEventListener('mavex:auth_expired', handleExpired);
   }, []);
 
   useEffect(() => {
@@ -87,42 +117,43 @@ export function AuthProvider({ children }) {
           try {
             const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
             if (userDoc.exists()) {
-              setProfile(userDoc.data());
+              const data = userDoc.data();
+              setProfile(data);
+              localStorage.setItem('mavex_auth_session', JSON.stringify(data));
             } else if (matchedSeed) {
-              setProfile({
+              const seedData = {
                 uid: currentUser.uid,
                 name: currentUser.displayName || matchedSeed.name,
                 email: currentUser.email,
                 role: matchedSeed.role,
                 departmentId: matchedSeed.departmentId,
                 title: matchedSeed.title
-              });
+              };
+              setProfile(seedData);
+              localStorage.setItem('mavex_auth_session', JSON.stringify(seedData));
             } else {
-              setProfile({
+              const defaultData = {
                 uid: currentUser.uid,
                 name: currentUser.displayName || currentUser.email,
                 role: 'admin',
                 departmentId: null
-              });
+              };
+              setProfile(defaultData);
+              localStorage.setItem('mavex_auth_session', JSON.stringify(defaultData));
             }
           } catch (err) {
             console.warn('Profile fetch fallback:', err.message);
             if (matchedSeed) {
-              setProfile({
+              const seedData = {
                 uid: currentUser.uid,
                 name: currentUser.displayName || matchedSeed.name,
                 email: currentUser.email,
                 role: matchedSeed.role,
                 departmentId: matchedSeed.departmentId,
                 title: matchedSeed.title
-              });
-            } else {
-              setProfile((prev) => prev || {
-                uid: currentUser.uid,
-                name: currentUser.displayName || currentUser.email,
-                role: 'admin',
-                departmentId: null
-              });
+              };
+              setProfile(seedData);
+              localStorage.setItem('mavex_auth_session', JSON.stringify(seedData));
             }
           }
         }
@@ -147,40 +178,42 @@ export function AuthProvider({ children }) {
       (acc) => acc.email.toLowerCase() === trimmedEmail && acc.password === password
     );
 
+    // إذا كان حساباً معتمداً، نفعله محلياً وفوراً
+    if (matchedSeed) {
+      const simulatedUser = {
+        uid: `seed-${matchedSeed.departmentId || 'admin'}`,
+        email: matchedSeed.email,
+        displayName: matchedSeed.name
+      };
+      const simulatedProfile = {
+        uid: simulatedUser.uid,
+        name: matchedSeed.name,
+        email: matchedSeed.email,
+        role: matchedSeed.role,
+        departmentId: matchedSeed.departmentId,
+        title: matchedSeed.title
+      };
+
+      localStorage.setItem('mavex_auth_session', JSON.stringify(simulatedProfile));
+      setUser(simulatedUser);
+      setProfile(simulatedProfile);
+      setLoading(false);
+
+      return { user: simulatedUser };
+    }
+
+    // للمستخدمين الآخرين عبر Firebase
     try {
-      // محاولة تسجيل الدخول عبر Firebase Auth
       const cred = await signInWithEmailAndPassword(auth, trimmedEmail, password);
       return cred;
     } catch (firebaseErr) {
-      // في حال لم يتم تفعيل Firebase Auth في Console أو حدث خطأ تكوين، ومطابقة الحساب التجريبي
-      if (matchedSeed) {
-        const simulatedUser = {
-          uid: `seed-${matchedSeed.role}-${Date.now()}`,
-          email: matchedSeed.email,
-          displayName: matchedSeed.name
-        };
-        const simulatedProfile = {
-          uid: simulatedUser.uid,
-          name: matchedSeed.name,
-          email: matchedSeed.email,
-          role: matchedSeed.role,
-          departmentId: matchedSeed.departmentId,
-          title: matchedSeed.title
-        };
-
-        setUser(simulatedUser);
-        setProfile(simulatedProfile);
-        localStorage.setItem('mavex_auth_session', JSON.stringify(simulatedProfile));
-        return { user: simulatedUser };
-      }
-
       throw firebaseErr;
     }
   };
 
   const loginWithSeed = (account) => {
     const simulatedUser = {
-      uid: `seed-${account.role}-${Date.now()}`,
+      uid: `seed-${account.departmentId || 'admin'}-${Date.now()}`,
       email: account.email,
       displayName: account.name
     };
@@ -199,7 +232,7 @@ export function AuthProvider({ children }) {
     return simulatedUser;
   };
 
-  const register = async (email, password, displayName, role = 'user') => {
+  const register = async (email, password, displayName, role = 'department_member') => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const newUser = userCredential.user;
     await updateProfile(newUser, { displayName });
@@ -225,6 +258,30 @@ export function AuthProvider({ children }) {
     return firebaseSignOut(auth).catch(() => {});
   };
 
+  /**
+   * Check if current user has permission for a specific role or department
+   */
+  const canAccess = useCallback((allowedRoles = [], requiredDept = null) => {
+    if (!profile) return false;
+    if (profile.role === 'admin') return true;
+
+    if (allowedRoles.length > 0) {
+      const normalizedUserRole = (profile.role === 'manager' ? 'department_manager' : profile.role);
+      const normalizedAllowed = allowedRoles.map(r => (r === 'manager' ? 'department_manager' : r));
+      if (!normalizedAllowed.includes(normalizedUserRole)) {
+        return false;
+      }
+    }
+
+    if (requiredDept) {
+      if (profile.departmentId && profile.departmentId !== requiredDept) {
+        return false;
+      }
+    }
+
+    return true;
+  }, [profile]);
+
   const value = {
     user,
     profile,
@@ -233,6 +290,7 @@ export function AuthProvider({ children }) {
     loginWithSeed,
     register,
     logout,
+    canAccess,
     isAdmin: profile?.role === 'admin',
     isAuthenticated: !!user,
     departmentId: profile?.departmentId || null
@@ -268,3 +326,4 @@ export function useAuth() {
   }
   return context;
 }
+

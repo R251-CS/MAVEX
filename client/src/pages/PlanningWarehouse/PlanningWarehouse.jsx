@@ -14,9 +14,12 @@ import {
   History, 
   AlertCircle,
   Layers,
-  Archive
+  Archive,
+  Lock
 } from 'lucide-react';
 import { useToast } from '../../components/common/Toast';
+import warehouseService from '../../services/warehouseService';
+import dashboardService from '../../services/dashboardService';
 
 export default function PlanningWarehouse() {
   const { selectedMonth } = useMonth();
@@ -100,20 +103,35 @@ export default function PlanningWarehouse() {
 
   // Fetch live items and movements
   useEffect(() => {
-    fetch('/api/v1/inventory/items', { headers: { 'x-dev-user': '1' } })
-      .then(res => res.json())
-      .then(res => {
-        if (res?.data?.items && res.data.items.length > 0) setItems(res.data.items);
+    let isMounted = true;
+    warehouseService.getItems()
+      .then(liveItems => {
+        if (isMounted && liveItems && liveItems.length > 0) setItems(liveItems);
       })
       .catch(() => {});
 
-    fetch('/api/v1/inventory/movements', { headers: { 'x-dev-user': '1' } })
-      .then(res => res.json())
-      .then(res => {
-        if (res?.data?.movements && res.data.movements.length > 0) setMovements(res.data.movements);
+    warehouseService.getMovements(selectedMonth)
+      .then(liveMovs => {
+        if (isMounted && liveMovs && liveMovs.length > 0) setMovements(liveMovs);
       })
       .catch(() => {});
-  }, []);
+
+    dashboardService.getDashboard(selectedMonth)
+      .then(res => {
+        const data = res?.data || res;
+        const dept = (data?.departments || []).find(d => d.departmentId === 'planning_warehouse');
+        if (isMounted && dept?.kpis) {
+          setKpis({
+            planning: Number(dept.kpis.planning) || 85,
+            stock: Number(dept.kpis.stock) || 94,
+            turnaround: Number(dept.kpis.turnaround) || 88
+          });
+        }
+      })
+      .catch(() => {});
+
+    return () => { isMounted = false; };
+  }, [selectedMonth]);
 
   const openMovementDialog = (type, defaultItemId = null) => {
     setMovementType(type);
@@ -126,7 +144,7 @@ export default function PlanningWarehouse() {
     setIsMovementModalOpen(true);
   };
 
-  const handleSaveMovement = (e) => {
+  const handleSaveMovement = async (e) => {
     e.preventDefault();
     const qty = Number(movementForm.quantity);
     if (!qty || qty <= 0) {
@@ -148,7 +166,9 @@ export default function PlanningWarehouse() {
     // Update item stock locally
     setItems(prev => prev.map(i => i.id === item.id ? { ...i, quantity: newBal } : i));
 
-    // Add movement record
+    // Immutable system-generated movement voucher reference
+    const autoRef = movementForm.referenceId.trim() || `${movementType === 'IN' ? 'REC' : 'ISS'}-${Math.floor(1000 + Math.random() * 9000)}`;
+
     const newMov = {
       id: `mov-${Date.now()}`,
       itemId: item.id,
@@ -157,35 +177,31 @@ export default function PlanningWarehouse() {
       quantity: qty,
       previousBalance: prevBal,
       newBalance: newBal,
-      reason: movementForm.reason.trim() || (movementType === 'IN' ? 'إذن إضافة مخزنية واردة' : 'إذن صرف خامات للتشغيل'),
-      referenceId: movementForm.referenceId.trim() || `REF-${Date.now().toString().slice(-4)}`,
+      reason: movementForm.reason.trim() || (movementType === 'IN' ? 'إذن إضافة مخزنية واردة معتمدة' : 'إذن صرف خامات للتشغيل الصناعي'),
+      referenceId: autoRef,
       createdBy: managerName,
       createdAt: new Date().toISOString().slice(0, 16).replace('T', ' ')
     };
 
     setMovements(prev => [newMov, ...prev]);
 
-    // Send to backend
-    fetch('/api/v1/inventory/movements', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-dev-user': '1' },
-      body: JSON.stringify({
+    try {
+      await warehouseService.recordMovement({
         itemId: item.id,
         warehouseId: 'wh-main',
         type: movementType,
         quantity: qty,
         reason: newMov.reason,
-        referenceId: newMov.referenceId
-      })
-    }).catch(() => {});
+        referenceId: autoRef
+      });
+      addToast(movementType === 'IN' ? `تم إضافة الكمية وقيد إذن الوارد (${autoRef}) ✓` : `تم صرف الخامات وقيد إذن الصرف (${autoRef}) ✓`, 'success');
+    } catch {
+      addToast('تم تسجيل حركة المخزن محلياً', 'info');
+    }
 
     setIsMovementModalOpen(false);
-    addToast(movementType === 'IN' ? 'تمت إضافة الكمية إلى رصيد المخزن' : 'تم صرف الكمية بنجاح وتسجيل الحركة', 'success');
   };
 
-  const handleKpiChange = (key, value) => {
-    setKpis(prev => ({ ...prev, [key]: value }));
-  };
 
   // Stock Columns
   const stockColumns = [

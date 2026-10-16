@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { useAuth, SEED_ACCOUNTS } from '../../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 import { GlassCard, Button, TextField } from '../../components/common';
-import { Lock, Mail, ShieldAlert, LogIn, UserPlus, Sparkles, ShieldCheck } from 'lucide-react';
+import { Lock, Mail, ShieldAlert, LogIn, UserPlus } from 'lucide-react';
 import { useToast } from '../../components/common/Toast';
 
 const FIREBASE_ERRORS = {
@@ -20,7 +20,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const { login, loginWithSeed } = useAuth() || {};
+  const { login } = useAuth() || {};
   const navigate = useNavigate();
   const location = useLocation();
   const { addToast } = useToast();
@@ -46,13 +46,6 @@ export default function Login() {
       setError(msg);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleQuickSeedLogin = (account) => {
-    if (loginWithSeed) {
-      loginWithSeed(account);
-      handleSuccessfulAuth();
     }
   };
 
@@ -140,68 +133,6 @@ export default function Login() {
             دخول إلى النظام
           </Button>
         </form>
-
-        {/* Quick Demo Accounts Selection */}
-        <div style={{
-          marginTop: '1.5rem',
-          padding: '1rem',
-          borderRadius: 'var(--radius-md)',
-          background: 'rgba(255, 255, 255, 0.03)',
-          border: '1px dashed var(--border-subtle)'
-        }}>
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.4rem',
-            fontSize: '0.8125rem',
-            fontWeight: 700,
-            color: 'var(--accent-blue)',
-            marginBottom: '0.75rem'
-          }}>
-            <Sparkles size={15} />
-            <span>حسابات تجريبية سريعة (دخول فوري بنقرة واحدة):</span>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.5rem' }}>
-            {SEED_ACCOUNTS.map((acc) => (
-              <button
-                key={acc.email}
-                type="button"
-                onClick={() => handleQuickSeedLogin(acc)}
-                style={{
-                  padding: '0.5rem 0.6rem',
-                  borderRadius: 'var(--radius-sm)',
-                  border: '1px solid var(--border-subtle)',
-                  background: 'rgba(255, 255, 255, 0.05)',
-                  color: 'var(--text-main)',
-                  fontSize: '0.75rem',
-                  cursor: 'pointer',
-                  textAlign: 'right',
-                  transition: 'all 0.2s ease',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '0.15rem'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'rgba(59, 130, 246, 0.15)';
-                  e.currentTarget.style.borderColor = 'var(--accent-blue)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
-                  e.currentTarget.style.borderColor = 'var(--border-subtle)';
-                }}
-              >
-                <div style={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                  <ShieldCheck size={12} color="var(--accent-blue)" />
-                  <span>{acc.title}</span>
-                </div>
-                <div style={{ color: 'var(--text-muted)', fontSize: '0.7rem' }}>
-                  {acc.email}
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
 
         {/* Link to Register */}
         <div style={{

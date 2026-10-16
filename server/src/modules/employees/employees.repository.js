@@ -3,7 +3,7 @@ const initialData = require('../../seeds/initial-data.json');
 
 async function getEmployeesByDepartment(departmentId) {
   try {
-    if (db && process.env.FIREBASE_PRIVATE_KEY) {
+    if (db) {
       const snapshot = await db.collection('employees')
         .where('departmentId', '==', departmentId)
         .where('isActive', '==', true)
@@ -16,7 +16,7 @@ async function getEmployeesByDepartment(departmentId) {
       if (employees.length > 0) return employees;
     }
   } catch (err) {
-    console.warn(`Firestore getEmployeesByDepartment fallback for ${departmentId}:`, err.message);
+    console.warn(`Database getEmployeesByDepartment fallback for ${departmentId}:`, err.message);
   }
 
   return initialData.employees.filter(
@@ -26,19 +26,19 @@ async function getEmployeesByDepartment(departmentId) {
 
 async function getEmployeeMonthlyMetrics(employeeId, month) {
   try {
-    if (db && process.env.FIREBASE_PRIVATE_KEY) {
+    if (db) {
       const docId = `${employeeId}_${month}`;
       const doc = await db.collection('employeeMonthlyMetrics').doc(docId).get();
       if (doc.exists) return { id: doc.id, ...doc.data() };
     }
   } catch (err) {
-    console.warn(`Firestore getEmployeeMonthlyMetrics fallback for ${employeeId}:`, err.message);
+    console.warn(`Database getEmployeeMonthlyMetrics fallback for ${employeeId}:`, err.message);
   }
   return { employeeId, month, score: 90, status: 'good' };
 }
 
 async function createEmployee(data) {
-  if (db && process.env.FIREBASE_PRIVATE_KEY) {
+  if (db) {
     const ref = await db.collection('employees').add({
       ...data,
       isActive: true,
@@ -53,8 +53,20 @@ async function createEmployee(data) {
   return newEmp;
 }
 
+async function getEmployeeById(employeeId) {
+  try {
+    if (db) {
+      const doc = await db.collection('employees').doc(employeeId).get();
+      if (doc.exists) return { id: doc.id, ...doc.data() };
+    }
+  } catch (err) {
+    console.warn(`Database getEmployeeById notice for ${employeeId}:`, err.message);
+  }
+  return initialData.employees.find(e => e.id === employeeId) || null;
+}
+
 async function deleteEmployee(employeeId) {
-  if (db && process.env.FIREBASE_PRIVATE_KEY) {
+  if (db) {
     await db.collection('employees').doc(employeeId).update({
       isActive: false,
       deletedAt: new Date().toISOString()
@@ -68,6 +80,8 @@ async function deleteEmployee(employeeId) {
 module.exports = {
   getEmployeesByDepartment,
   getEmployeeMonthlyMetrics,
+  getEmployeeById,
   createEmployee,
   deleteEmployee
 };
+

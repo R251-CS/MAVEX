@@ -3,7 +3,7 @@ const initialData = require('../../seeds/initial-data.json');
 
 async function getPayrollRecords(month) {
   try {
-    if (db && process.env.FIREBASE_PRIVATE_KEY) {
+    if (db) {
       let query = db.collection('payrollRecords');
       if (month) query = query.where('month', '==', month);
       const snapshot = await query.get();
@@ -12,7 +12,7 @@ async function getPayrollRecords(month) {
       if (payrolls.length > 0) return payrolls;
     }
   } catch (err) {
-    console.warn('Firestore getPayrollRecords fallback:', err.message);
+    console.warn('Database getPayrollRecords fallback:', err.message);
   }
 
   // Derive payroll breakdown from employees dataset (FR-17, FR-18)
@@ -33,7 +33,7 @@ async function getPayrollRecords(month) {
 
 async function getParties(type) {
   try {
-    if (db && process.env.FIREBASE_PRIVATE_KEY) {
+    if (db) {
       let query = db.collection('businessParties');
       if (type) query = query.where('type', '==', type);
       const snapshot = await query.get();
@@ -42,7 +42,7 @@ async function getParties(type) {
       if (parties.length > 0) return parties;
     }
   } catch (err) {
-    console.warn('Firestore getParties fallback:', err.message);
+    console.warn('Database getParties fallback:', err.message);
   }
 
   if (type) {
@@ -64,7 +64,7 @@ async function createParty(data) {
     createdAt: new Date().toISOString()
   };
 
-  if (db && process.env.FIREBASE_PRIVATE_KEY) {
+  if (db) {
     const ref = await db.collection('businessParties').add(newParty);
     const doc = await ref.get();
     return { id: doc.id, ...doc.data() };
@@ -77,7 +77,7 @@ async function createParty(data) {
 
 async function getTransactions(partyId) {
   try {
-    if (db && process.env.FIREBASE_PRIVATE_KEY) {
+    if (db) {
       let query = db.collection('financialTransactions').orderBy('date', 'desc');
       if (partyId) query = query.where('partyId', '==', partyId);
       const snapshot = await query.get();
@@ -86,7 +86,7 @@ async function getTransactions(partyId) {
       if (txs.length > 0) return txs;
     }
   } catch (err) {
-    console.warn('Firestore getTransactions fallback:', err.message);
+    console.warn('Database getTransactions fallback:', err.message);
   }
 
   if (partyId) {
@@ -110,7 +110,7 @@ async function createTransaction(data) {
     createdAt: new Date().toISOString()
   };
 
-  if (db && process.env.FIREBASE_PRIVATE_KEY) {
+  if (db) {
     const ref = await db.collection('financialTransactions').add(newTx);
     const doc = await ref.get();
     return { id: doc.id, ...doc.data() };

@@ -5,10 +5,12 @@ export const dashboardService = {
   async getDashboard(month) {
     try {
       const res = await api.get(`/dashboard?month=${month}`);
-      return res.data;
+      return res.data || res;
     } catch (err) {
       console.warn('Backend API unavailable or error occurred, using mock dashboard data:', err.message);
       return mockDashboardData;
     }
   }
 };
+
+export default dashboardService;

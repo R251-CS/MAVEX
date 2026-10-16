@@ -6,7 +6,7 @@ const initialData = require('../../seeds/initial-data.json');
  */
 async function getDepartmentMonthlyReport(departmentId, month) {
   try {
-    if (db && process.env.FIREBASE_PRIVATE_KEY) {
+    if (db) {
       const docId = `${departmentId}_${month}`;
       const doc = await db.collection('departmentMonthlyReports').doc(docId).get();
       if (doc.exists) {
@@ -14,7 +14,7 @@ async function getDepartmentMonthlyReport(departmentId, month) {
       }
     }
   } catch (err) {
-    console.warn(`Firestore getDepartmentMonthlyReport fallback for ${departmentId}:`, err.message);
+    console.warn(`Database getDepartmentMonthlyReport fallback for ${departmentId}:`, err.message);
   }
 
   return initialData.departmentMonthlyReports.find(
@@ -27,7 +27,7 @@ async function getDepartmentMonthlyReport(departmentId, month) {
  */
 async function getAllDepartmentReports(month) {
   try {
-    if (db && process.env.FIREBASE_PRIVATE_KEY) {
+    if (db) {
       const snapshot = await db.collection('departmentMonthlyReports')
         .where('month', '==', month)
         .get();
@@ -39,7 +39,7 @@ async function getAllDepartmentReports(month) {
       if (reports.length > 0) return reports;
     }
   } catch (err) {
-    console.warn('Firestore query fallback for monthly reports:', err.message);
+    console.warn('Database query fallback for monthly reports:', err.message);
   }
 
   // Instant response from curated factory baseline data

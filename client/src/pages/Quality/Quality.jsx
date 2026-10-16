@@ -1,16 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useMonth } from '../../context/MonthContext';
 import { PageContainer, PageHeader, Button, Modal, TextField, SelectField, DataTable, StatusBadge, GlassCard, ConfirmDialog } from '../../components/common';
 import { DepartmentSummary } from '../../components/departments/DepartmentSummary';
 import { KpiPanel } from '../../components/departments/KpiPanel';
-import { Plus, CheckSquare, Trash2, ShieldCheck, AlertCircle, Search } from 'lucide-react';
+import { Plus, CheckSquare, Trash2, ShieldCheck, AlertCircle, Search, Sparkles } from 'lucide-react';
 import { useToast } from '../../components/common/Toast';
+import qualityService from '../../services/qualityService';
+import dashboardService from '../../services/dashboardService';
 
 export default function Quality() {
   const { selectedMonth } = useMonth();
   const { addToast } = useToast();
   const [managerName, setManagerName] = useState('م. طارق محمود');
   const [searchQuery, setSearchQuery] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const [kpis, setKpis] = useState({
     acceptance: 95,
@@ -20,27 +23,64 @@ export default function Quality() {
 
   const [records, setRecords] = useState([
     {
-      id: 'rec-1',
+      id: 'REC-2026-101',
       date: '2026-10-12',
       item: 'دفعة صاج مجلفن 1.5 مم (وارد مورد)',
       issue: 'تفاوت طفيف في سمك طبقة الجلفنة - تم التوجيه بالعزل',
       status: 'pending'
     },
     {
-      id: 'rec-2',
+      id: 'REC-2026-102',
       date: '2026-10-10',
       item: 'مجموعات لحام الهيكل المعدني الحامل',
       issue: 'اجتياز الفحص غير الإتلافي بالأشعة بنجاح تام',
       status: 'resolved'
     },
     {
-      id: 'rec-3',
+      id: 'REC-2026-103',
       date: '2026-10-06',
       item: 'قطاعات الألومنيوم المؤكسد',
       issue: 'مطابقة تامة للمواصفات القياسية ISO-9001',
       status: 'resolved'
     }
   ]);
+
+  useEffect(() => {
+    let isMounted = true;
+    async function loadData() {
+      setLoading(true);
+      try {
+        const events = await qualityService.getQualityEvents(selectedMonth);
+        if (isMounted && events && events.length > 0) {
+          const mapped = events.map(e => ({
+            id: e.id || `REC-${Date.now().toString().slice(-4)}`,
+            date: e.date || new Date().toISOString().slice(0, 10),
+            item: e.itemOrMachine || e.title || e.item || 'عينة فحص',
+            issue: e.issue || e.description || e.notes || (e.status === 'passed' ? 'مطابقة للمواصفات الفنية' : 'عدم مطابقة'),
+            status: e.status === 'passed' ? 'resolved' : 'pending'
+          }));
+          setRecords(mapped);
+        }
+
+        const dashRes = await dashboardService.getDashboard(selectedMonth);
+        const data = dashRes?.data || dashRes;
+        const dept = (data?.departments || []).find(d => d.departmentId === 'quality');
+        if (isMounted && dept?.kpis) {
+          setKpis({
+            acceptance: parseInt(dept.kpis.acceptance, 10) || 95,
+            inspection: Number(dept.kpis.inspection) || 92,
+            customer: Number(dept.kpis.customer) || 98
+          });
+        }
+      } catch (err) {
+        console.warn('Quality load notice:', err.message);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    }
+    loadData();
+    return () => { isMounted = false; };
+  }, [selectedMonth]);
 
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState(null);
@@ -51,34 +91,59 @@ export default function Quality() {
     status: 'pending'
   });
 
-  const handleKpiChange = (key, value) => {
-    setKpis((prev) => ({ ...prev, [key]: value }));
-  };
 
-  const handleAddRecord = (e) => {
+  const handleAddRecord = async (e) => {
     e.preventDefault();
     if (!form.item.trim() || !form.issue.trim()) return;
-    setRecords((prev) => [
-      { id: `rec-${Date.now()}`, ...form },
-      ...prev
-    ]);
+
+    const newCode = `REC-${new Date().getFullYear()}-${Date.now().toString().slice(-3)}`;
+    const newRecord = {
+      id: newCode,
+      date: form.date,
+      item: form.item.trim(),
+      issue: form.issue.trim(),
+      status: form.status
+    };
+
+    setRecords((prev) => [newRecord, ...prev]);
+    setIsAddOpen(false);
+
+    try {
+      await qualityService.addQualityEvent({
+        title: form.item.trim(),
+        itemOrMachine: form.item.trim(),
+        issue: form.issue.trim(),
+        status: form.status === 'resolved' ? 'passed' : 'rejected',
+        month: selectedMonth,
+        date: form.date,
+        isViolation: form.status === 'pending'
+      });
+
+      if (form.status === 'pending') {
+        addToast('تم تسجيل الفحص وإرسال إشعار عدم مطابقة تلقائياً لإدارة المخالفات', 'warning');
+      } else {
+        addToast('تم توثيق تقرير الجودة بنجاح واعتماد النتيجة', 'success');
+      }
+    } catch (err) {
+      addToast('تم حفظ التقرير محلياً (وضع عدم الاتصال)', 'info');
+    }
+
     setForm({
       date: new Date().toISOString().slice(0, 10),
       item: '',
       issue: '',
       status: 'pending'
     });
-    setIsAddOpen(false);
-    addToast('تم تسجيل تقرير الفحص بنجاح', 'success');
   };
 
   const confirmDelete = () => {
     if (deleteTargetId) {
       setRecords((prev) => prev.filter((r) => r.id !== deleteTargetId));
       setDeleteTargetId(null);
-      addToast('تم حذف السجل بنجاح', 'info');
+      addToast('تم أرشفة السجل بنجاح', 'info');
     }
   };
+
 
   const filteredRecords = records.filter(
     (r) =>
@@ -198,7 +263,6 @@ export default function Quality() {
           { key: 'inspection', label: 'دقة وتغطية الفحص المرحلي للعينات', value: kpis.inspection, color: 'blue' },
           { key: 'customer', label: 'معدل رضا العميل النهائي وخلو الشكاوى', value: kpis.customer, color: 'purple' }
         ]}
-        onKpiChange={handleKpiChange}
       />
 
       {/* Quality Records Table */}

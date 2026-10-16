@@ -81,6 +81,27 @@
       "managerName": "أ. حسام فوزي",
       "performancePercentage": 90,
       "color": "blue"
+    },
+    {
+      "departmentId": "quality",
+      "name": "مراقبة الجودة",
+      "managerName": "م. طارق محمود",
+      "performancePercentage": 95,
+      "color": "green"
+    },
+    {
+      "departmentId": "safety",
+      "name": "السلامة والصحة المهنية",
+      "managerName": "أ. محمود فوزي",
+      "performancePercentage": 94,
+      "color": "cyan"
+    },
+    {
+      "departmentId": "violations",
+      "name": "إدارة المخالفات والرقابة",
+      "managerName": "أ. علاء إبراهيم",
+      "performancePercentage": 86,
+      "color": "red"
     }
   ],
   "departmentMonthlyReports": [
@@ -128,6 +149,33 @@
       "performancePercentage": 90,
       "status": "normal",
       "kpis": { "collectionsRate": "92%", "pendingBills": 1 }
+    },
+    {
+      "id": "quality_2026-10",
+      "departmentId": "quality",
+      "month": "2026-10",
+      "managerName": "م. طارق محمود",
+      "performancePercentage": 95,
+      "status": "normal",
+      "kpis": { "acceptance": "95%", "inspections": 28 }
+    },
+    {
+      "id": "safety_2026-10",
+      "departmentId": "safety",
+      "month": "2026-10",
+      "managerName": "أ. محمود فوزي",
+      "performancePercentage": 94,
+      "status": "normal",
+      "kpis": { "zeroIncidentsDays": 142, "auditsScore": "92%" }
+    },
+    {
+      "id": "violations_2026-10",
+      "departmentId": "violations",
+      "month": "2026-10",
+      "managerName": "أ. علاء إبراهيم",
+      "performancePercentage": 86,
+      "status": "normal",
+      "kpis": { "activeViolations": 3, "resolved": 18 }
     }
   ],
   "employees": [
@@ -513,6 +561,61 @@
       "status": "passed",
       "month": "2026-10",
       "inspector": "فني جودة حسام",
+      "date": "2026-10-14"
+    }
+  ],
+  "safetyIncidents": [
+    {
+      "id": "sa-1",
+      "title": "فحص جاهزية معدات الإطفاء ومخارج الطوارئ",
+      "area": "عنبر التشكيل والقص",
+      "status": "compliant",
+      "month": "2026-10",
+      "inspector": "أ. محمود فوزي",
+      "date": "2026-10-12"
+    },
+    {
+      "id": "sa-2",
+      "title": "تدقيق الالتزام بمهمات الوقاية الشخصية (PPE)",
+      "area": "منطقة كبائن الدهان",
+      "status": "compliant",
+      "month": "2026-10",
+      "inspector": "أ. محمود فوزي",
+      "date": "2026-10-10"
+    }
+  ],
+  "violations": [
+    {
+      "id": "v-1",
+      "code": "V-102",
+      "departmentId": "production",
+      "dept": "الإنتاج",
+      "description": "عدم ارتداء النظارة الواقية أثناء عمليات التجليخ",
+      "action": "تنبيه إداري وتوفير مهمة وقاية بديلة",
+      "status": "closed",
+      "month": "2026-10",
+      "date": "2026-10-09"
+    },
+    {
+      "id": "v-2",
+      "code": "V-103",
+      "departmentId": "planning_warehouse",
+      "dept": "المستودعات",
+      "description": "تأخير في تسجيل أذون الاستلام على النظام الإلكتروني",
+      "action": "تدريب تنشيطي على الإدخال الفوري",
+      "status": "closed",
+      "month": "2026-10",
+      "date": "2026-10-11"
+    },
+    {
+      "id": "v-3",
+      "code": "V-104",
+      "departmentId": "technical_office",
+      "dept": "المكتب الفني",
+      "description": "تعديل مقاسات دون اعتماد مهندس الجودة",
+      "action": "إعادة مراجعة المخطط وسحب النسخة القديمة",
+      "status": "pending",
+      "month": "2026-10",
       "date": "2026-10-14"
     }
   ]

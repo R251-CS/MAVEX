@@ -24,6 +24,11 @@
   transition: margin-inline-start var(--transition-smooth);
 }
 
+.mx-app-shell--collapsed .mx-app-shell__body {
+  margin-inline-start: var(--sidebar-collapsed);
+}
+
+
 .mx-app-shell__main {
   flex: 1;
   padding: var(--space-6) var(--page-gutter) var(--space-12);
@@ -73,8 +78,9 @@
 }
 
 .mx-header__menu-btn {
-  display: none;
+  display: inline-flex;
 }
+
 
 .mx-header__badge-pill {
   display: inline-flex;
@@ -143,8 +149,59 @@
   box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
-  transition: transform var(--transition-smooth), background-color var(--transition-smooth);
+  transition: width var(--transition-smooth), transform var(--transition-smooth), background-color var(--transition-smooth);
 }
+
+.mx-sidebar--collapsed {
+  width: var(--sidebar-collapsed);
+}
+
+.mx-sidebar--collapsed .mx-sidebar__brand {
+  padding: 0 var(--space-2);
+  justify-content: center;
+}
+
+.mx-sidebar--collapsed .mx-sidebar__link {
+  justify-content: center;
+  padding: var(--space-3) 0;
+}
+
+.mx-sidebar--collapsed .mx-sidebar__footer {
+  padding: var(--space-3) var(--space-2);
+}
+
+.mx-sidebar--collapsed .mx-sidebar__user {
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.mx-sidebar__collapse-btn {
+  margin-inline-start: auto;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--glass-bg-subtle);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.mx-sidebar__collapse-btn:hover {
+  color: var(--color-primary);
+  background: var(--color-primary-bg);
+  border-color: var(--color-primary-border);
+}
+
+.mx-sidebar--collapsed .mx-sidebar__collapse-btn {
+  margin-inline-start: 0;
+  margin-top: var(--space-1);
+}
+
 
 .mx-sidebar__brand {
   height: var(--header-height);
@@ -1002,22 +1059,30 @@
 }
 
 @media (max-width: 1024px) {
-  .mx-app-shell__body {
-    margin-inline-start: 0;
+  .mx-app-shell__body,
+  .mx-app-shell--collapsed .mx-app-shell__body {
+    margin-inline-start: 0 !important;
   }
 
-  .mx-sidebar {
+  .mx-sidebar,
+  .mx-sidebar--collapsed {
+    width: var(--sidebar-width) !important;
     transform: translateX(100%);
   }
 
   .mx-sidebar--open {
-    transform: translateX(0);
+    transform: translateX(0) !important;
+  }
+
+  .mx-sidebar__collapse-btn {
+    display: none !important;
   }
 
   .mx-header__menu-btn {
     display: inline-flex;
   }
 }
+
 
 @media (max-width: 768px) {
   :root {

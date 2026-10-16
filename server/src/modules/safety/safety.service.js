@@ -6,11 +6,14 @@ async function listIncidents(month) {
 }
 
 async function reportIncident(data) {
-  if (!data.title || !data.location) {
+  const location = data.location || data.area;
+  if (!data.title || !location) {
     throw new BadRequestError('عنوان الحادث/الملاحظة والموقع حقول إجبارية');
   }
   return await safetyRepository.createIncident({
     ...data,
+    location,
+    area: location,
     month: data.month || new Date().toISOString().slice(0, 7)
   });
 }

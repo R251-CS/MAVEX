@@ -11,6 +11,11 @@ router.use(authenticate);
 router.get('/incidents', safetyController.getIncidents);
 
 // POST /api/v1/safety/incidents
-router.post('/incidents', safetyController.createIncident);
+router.post(
+  '/incidents',
+  authorize([ROLES.ADMIN, ROLES.DEPARTMENT_MANAGER, ROLES.DEPARTMENT_MEMBER], { checkDepartment: true }),
+  safetyController.createIncident
+);
 
 module.exports = router;
+

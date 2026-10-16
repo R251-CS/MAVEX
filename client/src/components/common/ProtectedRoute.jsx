@@ -1,13 +1,16 @@
 import React from 'react';
-import { Navigate, Outlet, useLocation } from 'react-router-dom';
+import { Navigate, Outlet, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { ShieldAlert, ArrowRight } from 'lucide-react';
+import { GlassCard } from './GlassCard';
+import { Button } from './Button';
 
 /**
- * ProtectedRoute - يحمي الصفحات ويعيد توجيه المستخدم غير المسجّل إلى صفحة تسجيل الدخول
- * يُستخدم كـ Route element wrapper عبر <Outlet /> للـ nested routes
+ * ProtectedRoute - يحمي الصفحات والمسارات الفرعية
+ * يتحقق من تسجيل الدخول وصلاحيات الأدوار والقسم إن طُلبت
  */
-export function ProtectedRoute({ children }) {
-  const { user, loading } = useAuth();
+export function ProtectedRoute({ children, allowedRoles, requiredDepartment }) {
+  const { user, profile, loading, canAccess } = useAuth();
   const location = useLocation();
 
   if (loading) {
@@ -42,7 +45,51 @@ export function ProtectedRoute({ children }) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
+  // فحص صلاحيات الدور أو القسم إن كانت محددة لهذا المسار
+  if ((allowedRoles && allowedRoles.length > 0) || requiredDepartment) {
+    const hasPermission = canAccess(allowedRoles || [], requiredDepartment);
+    if (!hasPermission) {
+      return (
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '70vh',
+          padding: '2rem'
+        }}>
+          <GlassCard style={{ maxWidth: '500px', textAlign: 'center', padding: '2.5rem 2rem' }}>
+            <div style={{
+              width: '56px',
+              height: '56px',
+              borderRadius: '50%',
+              background: 'rgba(239, 68, 68, 0.15)',
+              color: 'var(--color-danger)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginBottom: '1.25rem'
+            }}>
+              <ShieldAlert size={28} />
+            </div>
+            <h2 style={{ fontSize: '1.375rem', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '0.5rem' }}>
+              غير مصرح بالدخول لهذا القسم
+            </h2>
+            <p style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)', marginBottom: '1.75rem', lineHeight: 1.6 }}>
+              حسابك الحالي ({profile?.name || user.email}) لا يمتلك الصلاحية الكافية لعرض هذا القسم أو تعديل بياناته.
+            </p>
+            <Link to="/" style={{ textDecoration: 'none' }}>
+              <Button variant="primary" icon={ArrowRight}>
+                العودة للوحة المؤشرات العامة
+              </Button>
+            </Link>
+          </GlassCard>
+        </div>
+      );
+    }
+  }
+
   // إذا استُخدم كـ wrapper لـ children مباشرة (Route element)
   return children ? children : <Outlet />;
 }
+
 

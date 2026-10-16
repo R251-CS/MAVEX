@@ -22,7 +22,19 @@ async function createViolation(req, res, next) {
   }
 }
 
+async function updateViolation(req, res, next) {
+  try {
+    const { id } = req.params;
+    const violation = await violationsService.modifyViolation(id, req.body);
+    res.status(200).json({ status: 'success', data: { violation } });
+  } catch (err) {
+    next(err);
+  }
+}
+
 module.exports = {
   getViolations,
-  createViolation
+  createViolation,
+  updateViolation
 };
+

@@ -3,14 +3,14 @@ const initialData = require('../../seeds/initial-data.json');
 
 async function getInventoryItems() {
   try {
-    if (db && process.env.FIREBASE_PRIVATE_KEY) {
+    if (db) {
       const snapshot = await db.collection('inventoryItems').get();
       const items = [];
       snapshot.forEach(doc => items.push({ id: doc.id, ...doc.data() }));
       if (items.length > 0) return items;
     }
   } catch (err) {
-    console.warn('Firestore getInventoryItems fallback:', err.message);
+    console.warn('Database getInventoryItems fallback:', err.message);
   }
 
   return initialData.inventoryItems || [];
@@ -18,14 +18,14 @@ async function getInventoryItems() {
 
 async function getMovements(limit = 20) {
   try {
-    if (db && process.env.FIREBASE_PRIVATE_KEY) {
+    if (db) {
       const snapshot = await db.collection('inventoryMovements').orderBy('createdAt', 'desc').limit(limit).get();
       const movements = [];
       snapshot.forEach(doc => movements.push({ id: doc.id, ...doc.data() }));
       if (movements.length > 0) return movements;
     }
   } catch (err) {
-    console.warn('Firestore getMovements fallback:', err.message);
+    console.warn('Database getMovements fallback:', err.message);
   }
 
   return initialData.inventoryMovements || [];
@@ -85,11 +85,12 @@ async function recordMovementTransaction({ itemId, warehouseId, type, quantity, 
   if (!initialData.inventoryMovements) initialData.inventoryMovements = [];
   initialData.inventoryMovements.unshift(movementRecord);
 
-  if (db && process.env.FIREBASE_PRIVATE_KEY) {
+  if (db) {
     try {
       await db.collection('inventoryMovements').add(movementRecord);
+      await db.collection('inventoryItems').doc(itemId).set({ quantity: newQty }, { merge: true });
     } catch (e) {
-      console.warn('Cloud firestore movement save error:', e.message);
+      console.warn('Database movement save error:', e.message);
     }
   }
 
