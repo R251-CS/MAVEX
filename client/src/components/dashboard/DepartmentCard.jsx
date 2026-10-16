@@ -46,18 +46,21 @@ export const DepartmentCard = ({
       <div>
         {/* Top Icon & Metric Row */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: '44px',
-            height: '44px',
-            borderRadius: 'var(--radius-md)',
-            background: currentTheme.bg,
-            border: `1px solid ${currentTheme.border}`,
-            color: currentTheme.main,
-            transition: 'transform var(--transition-fast)'
-          }}>
+          <div 
+            className="mx-dept-card__icon"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '44px',
+              height: '44px',
+              borderRadius: 'var(--radius-md)',
+              background: currentTheme.bg,
+              border: `1px solid ${currentTheme.border}`,
+              color: currentTheme.main,
+              transition: 'transform var(--transition-fast)'
+            }}
+          >
             {Icon && <Icon size={22} />}
           </div>
 

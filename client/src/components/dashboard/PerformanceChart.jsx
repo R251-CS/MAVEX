@@ -9,7 +9,7 @@ export const PerformanceChart = ({ departments = [] }) => {
   );
 
   return (
-    <GlassCard glow="purple" style={{ padding: '1.75rem', height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <GlassCard glow="blue" style={{ padding: '1.75rem', height: '100%', display: 'flex', flexDirection: 'column' }}>
       {/* Header Row */}
       <div style={{
         display: 'flex',
@@ -21,8 +21,8 @@ export const PerformanceChart = ({ departments = [] }) => {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <div style={{
-            background: 'var(--color-violet-bg)',
-            color: 'var(--color-violet)',
+            background: 'var(--color-primary-bg)',
+            color: 'var(--color-primary)',
             padding: '0.5rem',
             borderRadius: 'var(--radius-md)',
             display: 'flex'
@@ -45,9 +45,9 @@ export const PerformanceChart = ({ departments = [] }) => {
           gap: '0.375rem',
           fontSize: '0.75rem',
           fontWeight: 700,
-          color: 'var(--color-violet)',
-          background: 'var(--color-violet-bg)',
-          border: '1px solid rgba(124, 58, 237, 0.2)',
+          color: 'var(--color-primary)',
+          background: 'var(--color-primary-bg)',
+          border: '1px solid var(--color-primary-border)',
           padding: '0.25rem 0.625rem',
           borderRadius: 'var(--radius-full)'
         }}>

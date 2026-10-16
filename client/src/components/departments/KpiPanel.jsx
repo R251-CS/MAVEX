@@ -32,11 +32,11 @@ export const KpiPanel = ({
           gap: '0.375rem',
           padding: '0.25rem 0.625rem',
           borderRadius: 'var(--radius-full)',
-          background: 'rgba(16, 185, 129, 0.1)',
-          border: '1px solid rgba(16, 185, 129, 0.25)',
-          color: '#10b981',
+          background: 'var(--color-success-bg)',
+          border: '1px solid var(--color-success-border)',
+          color: 'var(--color-success)',
           fontSize: '0.75rem',
-          fontWeight: 600
+          fontWeight: 700
         }}>
           <ShieldCheck size={14} />
           <span>تُحسب آلياً من السيرفر بناءً على العمليات الحية</span>

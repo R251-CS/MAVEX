@@ -144,9 +144,9 @@ export default function Dashboard() {
             width: '46px',
             height: '46px',
             borderRadius: 'var(--radius-md)',
-            background: 'var(--color-violet-bg)',
-            border: '1px solid rgba(124, 58, 237, 0.25)',
-            color: 'var(--color-violet)',
+            background: 'var(--color-primary-bg)',
+            border: '1px solid var(--color-primary-border)',
+            color: 'var(--color-primary)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center'

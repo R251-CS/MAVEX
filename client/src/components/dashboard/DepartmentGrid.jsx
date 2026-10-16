@@ -14,7 +14,7 @@ import {
 const DEPT_ICONS = {
   technical_office: { icon: Cpu, route: '/technical-office', color: 'blue' },
   production: { icon: Factory, route: '/production', color: 'cyan' },
-  planning_warehouse: { icon: Boxes, route: '/planning-warehouse', color: 'purple' },
+  planning_warehouse: { icon: Boxes, route: '/planning-warehouse', color: 'green' },
   maintenance: { icon: Wrench, route: '/maintenance', color: 'amber' },
   finance: { icon: DollarSign, route: '/finance', color: 'green' },
   quality: { icon: CheckCircle2, route: '/quality', color: 'green' },

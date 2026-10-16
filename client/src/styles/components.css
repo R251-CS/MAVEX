@@ -12,7 +12,7 @@
   min-height: 100vh;
   width: 100%;
   position: relative;
-  background-color: var(--color-bg);
+  background-color: transparent;
 }
 
 .mx-app-shell__body {
@@ -53,10 +53,10 @@
   top: 0;
   z-index: var(--z-header);
   background: var(--glass-bg-heavy);
-  backdrop-filter: blur(var(--glass-blur-heavy));
-  -webkit-backdrop-filter: blur(var(--glass-blur-heavy));
-  border-bottom: 1px solid var(--glass-border);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(var(--glass-blur-heavy)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--glass-blur-heavy)) saturate(180%);
+  border-bottom: 1px solid var(--glass-border-subtle);
+  box-shadow: 0 4px 20px rgba(25, 42, 35, 0.04);
   transition: background-color var(--transition-smooth), border-color var(--transition-smooth);
 }
 
@@ -143,10 +143,10 @@
   inset-inline-start: 0;
   z-index: var(--z-sidebar);
   background: var(--glass-bg-heavy);
-  backdrop-filter: blur(var(--glass-blur-heavy));
-  -webkit-backdrop-filter: blur(var(--glass-blur-heavy));
-  border-inline-end: 1px solid var(--glass-border);
-  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(var(--glass-blur-heavy)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--glass-blur-heavy)) saturate(180%);
+  border-inline-end: 1px solid var(--glass-border-subtle);
+  box-shadow: 0 0 32px rgba(25, 42, 35, 0.05);
   display: flex;
   flex-direction: column;
   transition: width var(--transition-smooth), transform var(--transition-smooth), background-color var(--transition-smooth);
@@ -385,21 +385,32 @@
 
 .mx-glass-card {
   background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
+  backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
   border: 1px solid var(--glass-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--glass-shadow);
   position: relative;
   overflow: hidden;
   transition: transform var(--transition-smooth), border-color var(--transition-smooth), box-shadow var(--transition-smooth);
+}
+
+.mx-glass-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.9) 50%, transparent 100%);
+  pointer-events: none;
 }
 
 .mx-glass-card--hover:hover,
 .mx-glass-card--interactive:hover {
   transform: translateY(-2px);
   border-color: var(--glass-border-hover);
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 12px 32px rgba(25, 42, 35, 0.11), 0 2px 6px rgba(25, 42, 35, 0.04);
 }
 
 /* Refined Subtle Border Highlights on Hover (No Neon Auras) */
